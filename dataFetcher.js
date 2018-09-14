@@ -11,7 +11,7 @@ module.exports = {
 let interval = 60 * 1000 * 30 // 30m
 
 function fetchWithInterval(callback) {
-    console.log("Started fteching")
+    console.log("Started fetching")
     var requestLoop = setInterval(function() {
         fetchJSON(callback);
     }, interval);

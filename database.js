@@ -40,7 +40,7 @@ module.exports = {
     },
     getUser: function(userId, callback) {
         getUser(userId, callback)
-    }
+    }, loadUsersToDatabase
 };
 
 // init sqlite db
@@ -73,9 +73,9 @@ function initDatabase() {
             console.log('New table Achievements created!');
 
             db.run('CREATE TABLE Quest (\
-                id TEXT PRIMARY KEY, \
+                id INTEGER PRIMARY KEY, \
                 name TEXT, \
-                xp INT \
+                xp INT, \
                 description TEXT)'
             );
             console.log('New table Quest created!');
@@ -121,10 +121,10 @@ function upsertAchievement(achievement, callback) {
 }
 
 function upsertQuest(quest, callback) {
-    db.run('INSERT OR REPLACE INTO Quest VALUES(?, ?, ?, ?)', [quest.id, quest.name, quest.description, quest.xp], function(err) {
+    db.run('INSERT OR REPLACE INTO Quest (name, xp, description) VALUES(?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description], function(err) {
         if (err == null) {
             console.log(`Inserted quest ${quest.name}`)
-            callback()
+            callback(this.lastID)
         } else {
             console.log(err)
         }
@@ -214,7 +214,7 @@ function getUserQuests(userId, callback) {
 }
 
 function getQuest(questId, callback) {
-    db.all('SELECT * FROM Quests WHERE id = ?', [questId], function(err, rows) {
+    db.all('SELECT * FROM Quest WHERE id = ?', [questId], function(err, rows) {
         if (rows) {
             callback(rows)
         } else if (err) {

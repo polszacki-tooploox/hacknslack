@@ -40,10 +40,6 @@ app.post('/quest', (req, res) => {
   addQuestRequestHandler.handleRequest(req, res)
 });
 
-app.post('/', (req, res) => {
-  console.log(req)
-});
-
 // listen for requests :)
 var listener = app.listen(4212, function() {
     console.log('Your app is listening on port ' + listener.address().port);
@@ -51,12 +47,28 @@ var listener = app.listen(4212, function() {
 
 // hadnling buttons
 app.post('/', (req, res) => {
-    switch (req.body.type) {
+    var payload = JSON.parse(req.body.payload)
+    switch (payload.type) {
         case 'interactive_message':
-            switch (req.body.callback_id) {
+            switch (payload.callback_id) {
                 case 'new_quest':
-                    handleQuestAcceptance(req.body.user.id, req.body.actions[0].value)
+                    handleQuestAcceptance(payload.user.id, payload.actions[0].value)
             }
+        case 'dialog_submission':
+            var data = payload.submission
+            let quest = {
+                description: data.description,
+                xp: data.exp,
+                name: data.name
+            }
+            database.upsertQuest(quest, (newQuestId) => {
+                database.getQuest(newQuestId, (quest) => {
+                    var message = questConstructor.questMessage(quest)
+                    var attachment = questConstructor.questAttachments(message, newQuestId)
+                    res.send('')
+                    sendMessage("hacknslack", attachment)
+                })
+            })
     }
 })
 
@@ -93,6 +105,8 @@ const slackEvents = createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN
 const web = new WebClient(auth_token);
 const bot = new WebClient(bot_token);
 
+database.loadUsersToDatabase
+
 // Slack events client
 app.use('/events', slackEvents.expressMiddleware());
 
@@ -109,20 +123,16 @@ function handlerFunction() {
   Console.log("Received action")
 }
 
-function sendMessage(channel) {
-    var quest = new Object()
-    quest.name = "Test"
-    quest.description = "Test desc"
-    quest.xp = 500
-
-    let message = questConstructor.questMessage(quest)
-    let attachments = questConstructor.questAttachments(message)
+function sendMessage(channel, attachment) {
 
     // Send message using Slack Web Client
+    console.log(attachment)
+    console.log(channel)
     bot.chat.postMessage({
             channel: channel,
-            attachments: attachments,
+            attachments: attachment,
             as_user: false
+        }, (data) => {
+            console.log(data)
         })
-        .catch(console.error);
 }
