@@ -1,6 +1,7 @@
 module.exports = {
   questMessage,
-  questAttachments
+  questAttachments,
+  questAttachmentsAccepted
 };
 
 function questMessage(quest) {
@@ -9,7 +10,7 @@ function questMessage(quest) {
 
 function questAttachments(message, questId) {
   return [{
-            text: "${message}",
+            text: `${message}`,
             fallback: "You are unable to choose a game",
             callback_id: "new_quest",
             color: "#3AA3E3",
@@ -19,17 +20,20 @@ function questAttachments(message, questId) {
                     style: "primary",
                     text: "Accept",
                     type: "button",
-                    value: "${questId}"
+                    value: `${questId}`
                 }]
     }]
 }
 
 
-function questAttachmentsAccepted(message, userId) {
-  let acceptedMessage = `\n<@${userId}> accepted the quest! Good luck on your adventure!`
+function questAttachmentsAccepted(message, userIds) {
+  let users = userIds.map( (userId) => {
+    return `<@${userId.userId}>, `
+  })
+  let acceptedMessage = `\n ${users} accepted the quest! Good luck on your adventure!`
 
   return [{
-            text: "${message}" + acceptedMessage,
+            text: `${message}` + acceptedMessage,
             fallback: "You are unable to choose a game",
             callback_id: "new_quest",
             color: "#3AA3E3",

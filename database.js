@@ -17,9 +17,7 @@ module.exports = {
     assignAchievementToUser: function(userId, achievementId) {
         assignAchievementToUser(userId, achievementId)
     },
-    assignUserToQuest: function(userId, questId) {
-        assignUserToQuest(userId, questId)
-    },
+    assignUserToQuest,
     getAllAchievements: function(callback) {
         getAllAchievements(callback)
     },
@@ -40,7 +38,9 @@ module.exports = {
     },
     getUser: function(userId, callback) {
         getUser(userId, callback)
-    }, loadUsersToDatabase
+    },
+     loadUsersToDatabase,
+     getQuestUsers
 };
 
 // init sqlite db
@@ -131,11 +131,10 @@ function upsertQuest(quest, callback) {
     });
 }
 
-function assignUserToQuest(userId, questId, callback) {
+function assignUserToQuest(userId, questId) {
     db.run('INSERT OR REPLACE INTO UserQuest VALUES(?, ?)', [userId, questId], function(err) {
         if (err == null) {
             console.log(`Inserted user to quest ${userId} quest: ${questId}`)
-            callback()
         } else {
             console.log(err)
         }
@@ -202,7 +201,19 @@ function getUserAchievements(userId, callback) {
 }
 
 function getUserQuests(userId, callback) {
-    db.all('SELECT ua.questId FROM UserQuest WHERE userId = ?', [userId], function(err, rows) {
+    db.all('SELECT questId FROM UserQuest WHERE userId = ?', [userId], function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getQuestUsers(questId, callback) {
+    db.all('SELECT userId FROM UserQuest WHERE questId = ?', [questId], function(err, rows) {
         if (rows) {
             callback(rows)
         } else if (err) {
