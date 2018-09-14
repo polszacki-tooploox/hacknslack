@@ -23,3 +23,16 @@ function questAttachments(message, questId) {
                 }]
     }]
 }
+
+
+function questAttachmentsAccepted(message, userId) {
+  let acceptedMessage = `\n<@${userId}> accepted the quest! Good luck on your adventure!`
+
+  return [{
+            text: "${message}" + acceptedMessage,
+            fallback: "You are unable to choose a game",
+            callback_id: "new_quest",
+            color: "#3AA3E3",
+            attachment_type: "default"
+    }]
+}
