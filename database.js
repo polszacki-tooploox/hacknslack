@@ -2,44 +2,35 @@ module.exports = {
     init: function() {
         initDatabase()
     },
-    upsertMatch: function(match, callback) {
-        upsertMatch(match, callback)
-    },
     upsertUser: function(user, callback) {
         upsertUser(user, callback)
     },
-    upsertBet: function(bet) {
-        upsertBet(bet)
+    upsertAchievement: function(achievement, callback) {
+        upsertAchievement(achievement, callback)
     },
-    upsertTeam: function(team) {
-        upsertTeam(team)
+    upsertQuest: function(quest, callback) {
+        upsertQuest(quest, callback)
     },
-    updateUserPoints: function(userId, points) {
-        updateUserPoints(userId, points)
+    updateUserXPAndLevel: function(xp, level) {
+        updateUserXPAndLevel(xp, level)
     },
-    getTodaysMatches: function(callback) {
-        getTodaysMatches(callback)
+    assignAchievementToUser: function(userId, achievementId) {
+        assignAchievementToUser(userId, achievementId)
     },
-    getTopUsers: function(numberOfUsers, callback) {
-        getTopUsers(numberOfUsers, callback)
+    assignUserToQuest: function(userId, questId) {
+        assignUserToQuest(userId, questId)
     },
-    getFinishedMatches: function(callback) {
-        getFinishedMatches(callback)
+    getAllAchievements: function(callback) {
+        getAllAchievements(callback)
     },
-    getBetableMatches: function(callback) {
-        getBetableMatches(callback)
+    getAllQuests: function(numberOfUsers, callback) {
+        getAllQuests(numberOfUsers, callback)
     },
-    getBetableMatch: function(homeTeamCode, awayTeamCode, callback) {
-        getBetableMatch(homeTeamCode, awayTeamCode, callback)
+    getUserQuests: function(userId, callback) {
+        getUserQuests(userId, callback)
     },
-    getUserBets: function(userId, callback) {
-        getUserBets(userId, callback)
-    },
-    getBetsForMatch: function(homeTeamCode, awayTeamCode, callback) {
-        getBetsForMatch(homeTeamCode, awayTeamCode, callback)
-    },
-    getCompletedBets: function(userId, callback) {
-        getCompletedBets(userId, callback)
+    getUserAchievements: function(userId, callback) {
+        getUserAchievements(userId, callback)
     },
     getAllUsers: function(callback) {
         getAllUsers(callback)
@@ -61,38 +52,53 @@ function initDatabase() {
     // if ./.data/sqlite.db does not exist, create it, otherwise print records to console
     db.serialize(function() {
         if (!exists) {
-            db.run('CREATE TABLE Teams (id TEXT PRIMARY KEY, name TEXT, code TEXT, flag TEXT)');
-            console.log('New table Teams created!');
-
-            db.run('CREATE TABLE Matches (id INTEGER PRIMARY KEY, homeTeamId TEXT, awayTeamId TEXT, homeResult INT, awayResult INT, homePenalty INT, awayPenalty INT, matchDate DATE, winner TEXT, finished BOOL)');
-            console.log('New table Matches created!');
-
-            db.run('CREATE TABLE Users (id TEXT PRIMARY KEY, fullName, points INT)');
+            db.run('CREATE TABLE Users ( \
+                id TEXT PRIMARY KEY,\
+                name TEXT,\
+                roleId TEXT,\
+                xp INT, \
+                level INT)'
+            );
             console.log('New table Users created!');
 
-            db.run('CREATE TABLE Bets (id TEXT PRIMARY KEY, userId TEXT, matchId INT, homeResult INT, awayResult INT, winner TEXT)');
-            console.log('New table Bets created!');
+            db.run('CREATE TABLE Achievements (\
+                id INTEGER PRIMARY KEY,\
+                name TEXT, \
+                icon TEXT, \
+                description TEXT)'
+            );
+            console.log('New table Achievements created!');
+
+            db.run('CREATE TABLE Quest (\
+                id TEXT PRIMARY KEY, \
+                name TEXT, \
+                xp INT \
+                description TEXT)'
+            );
+            console.log('New table Quest created!');
+
+            db.run('CREATE TABLE UserQuest ( \
+                userId TEXT, \
+                questId TEXT, \
+                PRIMARY KEY(userId, questId) \
+            )')
+
+            db.run('CREATE TABLE UserAchievement ( \
+                userId TEXT, \
+                achievementId TEXT, \
+                PRIMARY KEY(userId, achievementId) \
+            )')
+            console.log('New tables created!');
         } else {
             console.log('Database is ready to go!');
         }
     });
 }
 
-function upsertMatch(match, callback) {
-    db.run('INSERT OR REPLACE INTO Matches VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [match.id, match.homeTeamId, match.awayTeamId, match.homeResult, match.awayResult, match.homePenalty, match.awayPentalty, match.matchDate, match.winner, match.finished], function(err) {
-        if (err == null) {
-            console.log(`Inserted match: ${match.id} ${match.homeTeamId}, ${match.awayTeamId}, ${match.homeResult}, ${match.awayResult}, ${match.homePenalty}, ${match.awayPentalty}, ${match.matchDate}, ${match.winner}, ${match.finished}`)
-        } else {
-            console.log(err)
-        }
-        callback()
-    });
-}
-
 function upsertUser(user, callback) {
-    db.run('INSERT OR REPLACE INTO Users VALUES(?, ?, ?)', [user.id, user.fullName, user.points], function(err) {
+    db.run('INSERT OR REPLACE INTO Users VALUES(?, ?, ?, ?, ?)', [user.id, user.name, user.roleId, user.xp, user.level], function(err) {
         if (err == null) {
-            console.log(`Inserted user ${user.fullName}`)
+            console.log(`Inserted user ${user.name}`)
             callback()
         } else {
             console.log(err)
@@ -100,195 +106,63 @@ function upsertUser(user, callback) {
     });
 }
 
-function upsertBet(bet) {
-
-    db.run('INSERT OR REPLACE INTO Bets(id, userId, matchId, homeResult, awayResult, winner) VALUES(?, ?, ?, ?, ?, ?)', [bet.userId + `${bet.matchId}`, bet.userId, bet.matchId, bet.homeResult, bet.awayResult, bet.winner], function(err) {
+function upsertAchievement(achievement, callback) {
+    db.run('INSERT OR REPLACE INTO Achievements VALUES(?, ?, ?, ?)', [achievement.id, achievement.name, achievement.icon, achievement.description], function(err) {
         if (err == null) {
-            console.log(`Inserted bet for userId: ${bet.userId}`)
+            console.log(`Inserted achievement ${achievement.name}`)
+            callback()
         } else {
             console.log(err)
         }
     });
 }
 
-function upsertTeam(team) {
-    db.run('INSERT OR REPLACE INTO Teams VALUES(?, ?, ?, ?)', [team.id, team.name, team.code, team.flag], function(err) {
+function upsertQuest(quest, callback) {
+    db.run('INSERT OR REPLACE INTO Quest VALUES(?, ?, ?, ?)', [quest.id, quest.name, quest.description, quest.xp], function(err) {
         if (err == null) {
-            console.log(`Inserted team with name: ${team.name}`)
+            console.log(`Inserted quest ${quest.name}`)
+            callback()
         } else {
             console.log(err)
         }
     });
 }
 
-function updateUserPoints(userId, points) {
+function assignUserToQuest(userId, questId, callback) {
+    db.run('INSERT OR REPLACE INTO UserQuest VALUES(?, ?)', [userId, questId], function(err) {
+        if (err == null) {
+            console.log(`Inserted user to quest ${userId} quest: ${questId}`)
+            callback()
+        } else {
+            console.log(err)
+        }
+    });
+}
+
+function assignAchievementToUser(achievementId, userId, callback) {
+    db.run('INSERT OR REPLACE INTO UserAchievement VALUES(?, ?)', [userId, achievementId], function(err) {
+        if (err == null) {
+            console.log(`Inserted user to achievement ${userId} achievement: ${achievementId}`)
+            callback()
+        } else {
+            console.log(err)
+        }
+    });
+}
+
+function updateUserXPAndLevel(userId, xp, level) {
     console.log("Updating points")
-    db.run('UPDATE Users SET points = ? WHERE id = ?', [points, userId], function(err) {
+    db.run('UPDATE Users SET xp = ?, level = ? WHERE id = ?', [xp, level, userId], function(err) {
         if (err == null) {
-            console.log(`Updated points for user ${userId}`)
+            console.log(`Updated xp and level for user ${userId}`)
         } else {
             console.log(err)
         }
     });
-}
-
-function getTodaysMatches(callback) {
-
-    var start = new Date();
-    start.setHours(0, 0, 0, 0);
-
-    var end = new Date();
-    end.setHours(23, 59, 59, 999);
-
-
-    db.all('SELECT m.id, m.matchDate, m.homeTeamId, m.awayTeamId, t1.flag as homeTeamFlag, t2.flag as awayTeamFlag, m.homeResult, m.awayResult, m.homePenalty, m.awayPenalty,' +
-        't1.flag as homeFlag, t1.code as homeCode, ' +
-        't2.code as awayCode, t2.flag as awayFlag ' +
-        'FROM Matches m JOIN Teams t1 ON m.homeTeamId = t1.id JOIN Teams t2 ON m.awayTeamId = t2.id WHERE m.matchDate BETWEEN ? AND ? ORDER BY matchDate', [start, end],
-        function(err, rows) {
-            if (rows) {
-                console.log(rows)
-                callback(rows)
-            } else if (err) {
-                console.log(err)
-            } else {
-                console.log("what")
-            }
-        });
-}
-
-function getTopUsers(numberOfUsers, callback) {
-    db.all('SELECT * FROM Users ORDER BY points DESC, fullName ASC LIMIT ?', [numberOfUsers], function(err, rows) {
-        if (rows) {
-            callback(rows)
-        } else if (err) {
-            console.log(err)
-        } else {
-            console.log("what")
-        }
-    });
-}
-
-function getBetableMatches(callback) {
-
-    var minDate = new Date();
-    console.log(minDate.toLocaleTimeString())
-    minDate.setMinutes(minDate.getMinutes() + 5); // Max 5 min przed
-    console.log(minDate.toLocaleTimeString())
-
-    db.all('SELECT m.id, m.matchDate, m.homeResult, m.awayResult, ' +
-        't1.code as homeTeamCode, t2.code as awayTeamCode, t1.flag as homeTeamFlag, t2.flag as awayTeamFlag FROM Matches m ' +
-        'JOIN Teams t1 ON m.homeTeamId = t1.id JOIN Teams t2 ON m.awayTeamId = t2.id ' +
-        'WHERE m.finished = 0 AND m.matchDate > ?' +
-        'ORDER BY matchDate LIMIT 10 ', [minDate],
-        function(err, rows) {
-            if (rows) {
-                console.log(rows)
-                callback(rows)
-            } else if (err) {
-                console.log(err)
-            } else {
-                console.log("what")
-            }
-        });
-}
-
-function getBetableMatch(homeTeamCode, awayTeamCode, callback) {
-    getBetableMatches(function(matches) {
-        var result = matches.filter(match => match.homeTeamCode == homeTeamCode && match.awayTeamCode == awayTeamCode)
-        callback(result[0])
-    });
-}
-
-function getFinishedMatches(callback) {
-    db.all('SELECT * FROM Matches WHERE finished = 1', function(err, rows) {
-        if (rows) {
-            callback(rows)
-        } else {
-            console.log(err)
-        }
-    });
-}
-
-function getUserBets(userId, callback) {
-    db.all('SELECT b.homeResult, b.awayResult, b.winner, ' +
-        't1.flag as homeFlag, t1.code as homeCode, ' +
-        't2.code as awayCode, t2.flag as awayFlag, ' +
-        'm.homeResult as finalHomeResult, m.awayResult as finalAwayResult, m.winner as finalWinner, m.finished ' +
-        'FROM Bets b ' +
-        'JOIN Matches m ON b.matchId = m.id JOIN Teams t1 ON m.homeTeamId = t1.id JOIN Teams t2 ON m.awayTeamId = t2.id ' +
-        'WHERE b.userId = ? ORDER BY m.matchDate', [userId],
-        function(err, rows) {
-            if (rows) {
-                console.log(rows)
-                callback(rows)
-            } else if (err) {
-                console.log(err)
-            } else {
-                console.log("what")
-            }
-        });
-}
-
-function getBetsForMatch(homeTeamCode, awayTeamCode, callback) {
-
-      db.all('SELECT m.id, t1.code as homeTeamCode, t2.code as awayTeamCode, t1.flag as homeTeamFlag, t2.flag as awayTeamFlag FROM Matches m ' +
-        'JOIN Teams t1 ON m.homeTeamId = t1.id JOIN Teams t2 ON m.awayTeamId = t2.id WHERE t1.code = ? AND t2.code = ?', [homeTeamCode, awayTeamCode], function(err, rows) {
-                if (rows) {
-        if (!rows[0]) {
-            callback([])
-            return
-        }
-
-        db.all('SELECT b.homeResult, b.awayResult,' +
-            't1.flag as homeFlag, t1.code as homeCode, ' +
-            't2.code as awayCode, t2.flag as awayFlag ' +
-            'FROM Bets b ' +
-            'JOIN Matches m ON b.matchId = m.id JOIN Teams t1 ON m.homeTeamId = t1.id JOIN Teams t2 ON m.awayTeamId = t2.id ' +
-            'WHERE b.matchId = ?', [rows[0].id],
-            function(err, rows) {
-                if (rows) {
-                    console.log(rows)
-                    callback(rows)
-                } else if (err) {
-                    console.log(err)
-                } else {
-                    console.log("what")
-                }
-            });
-
-
-
-
-                } else if (err) {
-                    console.log(err)
-                } else {
-                    console.log("what")
-                }
-            });
-
-}
-
-function getCompletedBets(userId, callback) {
-    db.all('SELECT b.winner, b.homeResult, b.awayResult, ' +
-        'm.homeResult as finalHomeResult, m.awayResult as finalAwayResult, m.winner as finalWinner ' +
-        'FROM Bets b ' +
-        'JOIN Matches m ON b.matchId = m.id ' +
-        'WHERE b.userId = ? AND m.finished = 1', [userId],
-        function(err, rows) {
-            if (rows) {
-                console.log(rows)
-                callback(rows)
-            } else if (err) {
-                console.log(err)
-            } else {
-                console.log("what")
-            }
-        });
 }
 
 function getAllUsers(callback) {
-    db.all('SELECT u.id, u.fullName FROM Users u JOIN Bets b ON b.userId = u.id GROUP BY u.id', function(err, rows) {
+    db.all('SELECT u.id, u.name FROM Users', function(err, rows) {
         if (rows) {
             console.log(rows)
             callback(rows)
@@ -303,6 +177,56 @@ function getAllUsers(callback) {
 function getUser(userId, callback) {
     db.all('SELECT * FROM Users WHERE id = ?', [userId], function(err, rows) {
         if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getUserAchievements(userId, callback) {
+    db.all('SELECT ua.achievementId FROM UserAchievement WHERE userId = ?', [userId], function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getUserQuests(userId, callback) {
+    db.all('SELECT ua.questId FROM UserQuest WHERE userId = ?', [userId], function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getAllAchievements(callback) {
+    db.all('SELECT u.id, u.name, u.description, u.icon FROM Achievements', function(err, rows) {
+        if (rows) {
+            console.log(rows)
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getAllQuests(callback) {
+    db.all('SELECT u.id, u.name, u.description, u.xp FROM Quests', function(err, rows) {
+        if (rows) {
+            console.log(rows)
             callback(rows)
         } else if (err) {
             console.log(err)
