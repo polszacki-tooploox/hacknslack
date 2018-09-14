@@ -57,8 +57,19 @@ app.post('/', (req, res) => {
         case 'interactive_message':
             switch (payload.callback_id) {
                 case 'new_quest':
-                    handleQuestAcceptance(payload.user.id, payload.actions[0].value)
+                var questId = payload.actions[0].value
+                    handleQuestAcceptance(payload.user.id, questId)
+                    database.getQuest(questId, (quest) => {
+                        database.getQuestUsers(questId, (userIds) => {
+                            var message = questConstructor.questMessage(quest)
+                            var attachment = questConstructor.questAttachmentsAccepted(message, userIds)
+                            res.send('')
+                            updateMessage(payload.channel.id, attachment, payload.message_ts)
+                        })
+                        
+                    })
             }
+            break
         case 'dialog_submission':
             var data = payload.submission
             let quest = {
@@ -74,6 +85,7 @@ app.post('/', (req, res) => {
                     sendMessage("hacknslack", attachment)
                 })
             })
+            break
     }
 })
 
@@ -141,3 +153,11 @@ function sendMessage(channel, attachment) {
             console.log(data)
         })
 }
+
+function updateMessage(channel, attachment, timestamp) {
+    bot.chat.update({
+        channel: channel,
+        attachments: attachment,
+        ts: timestamp
+    })
+}   
