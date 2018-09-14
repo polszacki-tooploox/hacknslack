@@ -16,6 +16,7 @@ var bodyParser = require('body-parser');
 var dataFetcher = require('./dataFetcher');
 var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
+var heroReportHanler = require('./heroReportHandler')
 var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
 var app = express();
@@ -39,6 +40,10 @@ app.get("/", function(request, response) {
 app.post('/quest', (req, res) => {
   addQuestRequestHandler.handleRequest(req, res)
 });
+
+app.post('/check-hero', (req, res) => {
+    heroReportHanler.heroReportAnswer(req, res)
+  });
 
 // listen for requests :)
 var listener = app.listen(4212, function() {
