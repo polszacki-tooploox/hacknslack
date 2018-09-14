@@ -52,7 +52,7 @@ function handleRequest(request, response) {
               { label: '250 xp', value: 250 },
               { label: '500 xp', value: 500 },
               { label: '1500 xp', value: 1500 },
-            ],
+            ]
           },
           {
             label: 'Number of heroes',
@@ -62,7 +62,7 @@ function handleRequest(request, response) {
             value: 1,
             hint: 'Number of heroes needed',
           },
-        ],
+        ]
       }),
     };
 
@@ -70,7 +70,11 @@ function handleRequest(request, response) {
     console.log(qs.stringify(dialog))
 
     // open the dialog by calling dialogs.open method and sending the payload
-    axios.post(`${apiUrl}/dialog.open`, qs.stringify(dialog))
+    axios.post(`${apiUrl}/dialog.open`, qs.stringify(dialog), {
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    })
       .then((result) => {
         response.send('');
       }).catch((err) => {

@@ -51,7 +51,7 @@ function initDatabase() {
                 name TEXT, \
                 xp INT, \
                 description TEXT, \
-                usersLimit: INT)'
+                usersLimit INT)'
             );
             console.log('New table Quest created!');
 
@@ -96,7 +96,7 @@ function upsertAchievement(achievement, callback) {
 }
 
 function upsertQuest(quest, callback) {
-    db.run('INSERT OR REPLACE INTO Quest (name, xp, description) VALUES(?, ?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description, quest.usersLimit], function(err) {
+    db.run('INSERT OR REPLACE INTO Quest (name, xp, description, usersLimit) VALUES(?, ?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description, quest.usersLimit], function(err) {
         if (err == null) {
             console.log(`Inserted quest ${quest.name}`)
             callback(this.lastID)
@@ -117,7 +117,7 @@ function assignUserToQuest(userId, questId) {
 }
 
 function unassignUserFromQuest(userId, questId) {
-    db.run('DELETE FROM UserQuest WHERE userId = ?, questId = ?', [userId, questId], function(err) {
+    db.run('DELETE FROM UserQuest WHERE userId = ? AND questId = ?', [userId, questId], function(err) {
         if (err == null) {
             console.log(`Deleted user <-> quest connection, user: ${userId} quest: ${questId}`)
         } else {

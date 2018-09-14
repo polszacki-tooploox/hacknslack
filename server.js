@@ -16,7 +16,7 @@ var bodyParser = require('body-parser');
 var dataFetcher = require('./dataFetcher');
 var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
-var heroReportHanler = require('./heroReportHandler')
+var heroReportHandler = require('./heroReportHandler')
 var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
 var ignoreQuest = require('./questParticipation').ignoreQuest
@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 
 // we've started you off with Express,
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
-database.init()
+database.initDatabase()
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
@@ -42,8 +42,10 @@ app.post('/quest', (req, res) => {
   addQuestRequestHandler.handleRequest(req, res)
 });
 
-app.post('/check-hero', (req, res) => {
-    heroReportHanler.heroReportAnswer(req, res)
+app.post('/check_hero', (req, res) => {
+    heroReportHandler.heroReportAnswer(req, res, (response) => {
+        sendMessageWithoutAttachment("hacknslack", response)
+    })
   });
 
 // listen for requests :)
@@ -59,7 +61,8 @@ app.post('/', (req, res) => {
             switch (payload.callback_id) {
                 case 'new_quest':
                     var questId = payload.actions[0].value
-                    if (payload.actions[0] == "accept") {
+                    var didAccept = payload.actions[0].name == "accept"
+                    if (didAccept) {
                         handleQuestAcceptance(payload.user.id, questId)
                     } else {
                         handleQuestIgnore(payload.user.id, questId)
@@ -67,7 +70,7 @@ app.post('/', (req, res) => {
                     database.getQuest(questId, (quest) => {
                         database.getQuestUsers(questId, (userIds) => {
                             var message = questConstructor.questMessage(quest)
-                            var attachment = questConstructor.questAttachmentsAccepted(message, userIds)
+                            var attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
                             res.send('')
                             updateMessage(payload.channel.id, attachment, payload.message_ts)
                         })
@@ -99,7 +102,7 @@ function handleQuestAcceptance(userId, questId) {
 }
 
 function handleQuestIgnore(userId, questId) {
-    unassignUserFromQuest(userId, questId)
+    database.unassignUserFromQuest(userId, questId)
 }
 
 // request to self to wake up
@@ -157,6 +160,19 @@ function sendMessage(channel, attachment) {
     bot.chat.postMessage({
             channel: channel,
             attachments: attachment,
+            as_user: false
+        }, (data) => {
+            console.log(data)
+        })
+}
+
+function sendMessageWithoutAttachment(channel, message) {
+
+    // Send message using Slack Web Client
+    console.log(channel)
+    bot.chat.postMessage({
+            text: message,
+            channel: channel,
             as_user: false
         }, (data) => {
             console.log(data)

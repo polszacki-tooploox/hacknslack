@@ -35,7 +35,7 @@ function questAttachments(message, questId) {
 }
 
 
-function questAttachmentsAccepted(message, userIds) {
+function questAttachmentsAccepted(message, userIds, questId) {
   let users = userIds.map( (userId) => {
     return `<@${userId.userId}>, `
   })
