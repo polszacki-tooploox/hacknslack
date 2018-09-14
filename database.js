@@ -76,7 +76,7 @@ function initDatabase() {
 function upsertUser(user, callback) {
     db.run('INSERT OR REPLACE INTO Users (id, name, roleId, xp, level) VALUES(?, ?, ?, ?, ?)', [user.id, user.fullName, user.roleID, user.xp, user.level], function(err) {
         if (err == null) {
-            console.log(`Inserted user ${user.name}`)
+            console.log(`Inserted user ${user.id}`)
             callback()
         } else {
             console.log(err)
