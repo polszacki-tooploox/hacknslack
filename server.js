@@ -28,7 +28,7 @@ app.use(bodyParser.json());
 
 // we've started you off with Express,
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
-database.init()
+database.initDatabase()
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
