@@ -48,10 +48,13 @@ function handleRequest(request, response) {
             type: 'select',
             name: 'exp',
             options: [
+              { label: '5 xp', value: 5 },
+              { label: '10 xp', value: 10 },
+              { label: '15 xp', value: 15 },
+              { label: '20 xp', value: 20 },
+              { label: '25 xp', value: 25 },
+              { label: '50 xp', value: 50 },
               { label: '100 xp', value: 100 },
-              { label: '250 xp', value: 250 },
-              { label: '500 xp', value: 500 },
-              { label: '1500 xp', value: 1500 },
             ]
           },
           {
