@@ -44,7 +44,7 @@ app.post('/quest', (req, res) => {
 
 app.post('/check_hero', (req, res) => {
     heroReportHandler.heroReportAnswer(req, res, (response) => {
-        sendMessageWithoutAttachment("hacknslack", response)
+        sendMessageWithoutAttachment("hacknslack", response, req.body.user_id)
     })
   });
 
@@ -166,13 +166,14 @@ function sendMessage(channel, attachment) {
         })
 }
 
-function sendMessageWithoutAttachment(channel, message) {
+function sendMessageWithoutAttachment(channel, message, userId) {
 
     // Send message using Slack Web Client
     console.log(channel)
-    bot.chat.postMessage({
+    bot.chat.postEphemeral({
             text: message,
             channel: channel,
+            user: userId,
             as_user: false
         }, (data) => {
             console.log(data)

@@ -9,9 +9,25 @@ function participateInQuest(userId, questId) {
     database.getUser(userId, (user) => {
         database.getQuest(questId, (quest) => {
             var currentXP = user.xp
-            var currentLevel = user.level
-            database.updateUserXPAndLevel(currentXP + quest.xp, currentLevel)
+            if (currentXP == null) {
+                currentXP = 0
+            }
+            var currentLevel = calculateLevel(currentXP)
+            database.updateUserXPAndLevel(userId, currentXP + quest[0].xp, currentLevel)
         })
+    })
+}
+
+function calculateLevel(xp) {
+    var xpLevels = [
+        1000,
+        3000,
+        5000,
+        10000,
+        20000
+    ]
+    return xpLevels.findIndex((element) => {
+        return xp < element
     })
 }
 

@@ -164,7 +164,7 @@ function getAllUsers(callback) {
 function getUser(userId, callback) {
     db.all('SELECT * FROM Users WHERE id = ?', [userId], function(err, rows) {
         if (rows) {
-            callback(rows)
+            callback(rows[0])
         } else if (err) {
             console.log(err)
         } else {
@@ -250,8 +250,8 @@ function getAllQuests(callback) {
 function loadUsersToDatabase(users) {
     for (var i = 0, len = users.length; i < len; i++) {
         let user = users[i]
-        getUser(user.id, function(savedUsers) {
-            if (savedUsers.length == 0) {
+        getUser(user.id, function(savedUser) {
+            if (savedUser == undefined || savedUser == null) {
                 var newUser = new Object()
                 newUser.id = user.id
                 newUser.fullName = user.name
