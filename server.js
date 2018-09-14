@@ -18,6 +18,7 @@ var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
 var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
+var ignoreQuest = require('./questParticipation').ignoreQuest
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -52,8 +53,12 @@ app.post('/', (req, res) => {
         case 'interactive_message':
             switch (payload.callback_id) {
                 case 'new_quest':
-                var questId = payload.actions[0].value
-                    handleQuestAcceptance(payload.user.id, questId)
+                    var questId = payload.actions[0].value
+                    if (payload.actions[0] == "accept") {
+                        handleQuestAcceptance(payload.user.id, questId)
+                    } else {
+                        handleQuestIgnore(payload.user.id, questId)
+                    }
                     database.getQuest(questId, (quest) => {
                         database.getQuestUsers(questId, (userIds) => {
                             var message = questConstructor.questMessage(quest)
@@ -61,7 +66,6 @@ app.post('/', (req, res) => {
                             res.send('')
                             updateMessage(payload.channel.id, attachment, payload.message_ts)
                         })
-                        
                     })
             }
             break
@@ -88,6 +92,9 @@ function handleQuestAcceptance(userId, questId) {
     participateInQuest(userId, questId)
 }
 
+function handleQuestIgnore(userId, questId) {
+    unassignUserFromQuest(userId, questId)
+}
 
 // request to self to wake up
 var request = require("request")

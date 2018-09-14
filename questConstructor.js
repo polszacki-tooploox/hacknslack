@@ -11,17 +11,26 @@ function questMessage(quest) {
 function questAttachments(message, questId) {
   return [{
             text: `${message}`,
-            fallback: "You are unable to choose a game",
+            fallback: "You are unable to accept the quest",
             callback_id: "new_quest",
             color: "#3AA3E3",
             attachment_type: "default",
-            actions: [{
-                    name: "accept",
-                    style: "primary",
-                    text: "Accept",
-                    type: "button",
-                    value: `${questId}`
-                }]
+            actions: [
+              {
+              name: "accept",
+              style: "primary",
+              text: "Accept",
+              type: "button",
+              value: `${questId}`
+              }, 
+              {
+                name: "ignore",
+                style: "danger",
+                text: "Ignore",
+                type: "button",
+                value: `${questId}`
+              }
+        ]
     }]
 }
 
@@ -34,9 +43,25 @@ function questAttachmentsAccepted(message, userIds) {
 
   return [{
             text: `${message}` + acceptedMessage,
-            fallback: "You are unable to choose a game",
+            fallback: "You are unable to accept the quest",
             callback_id: "new_quest",
             color: "#3AA3E3",
-            attachment_type: "default"
+            attachment_type: "default",
+            actions: [
+              {
+                name: "accept",
+                style: "primary",
+                text: "Accept",
+                type: "button",
+                value: `${questId}`
+                }, 
+                {
+                name: "ignore",
+                style: "danger",
+                text: "Ignore",
+                type: "button",
+                value: `${questId}`
+              }
+        ]
     }]
 }

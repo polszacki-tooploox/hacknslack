@@ -18,6 +18,7 @@ module.exports = {
         assignAchievementToUser(userId, achievementId)
     },
     assignUserToQuest,
+    unassignUserFromQuest,
     getAllAchievements: function(callback) {
         getAllAchievements(callback)
     },
@@ -135,6 +136,16 @@ function assignUserToQuest(userId, questId) {
     db.run('INSERT OR REPLACE INTO UserQuest VALUES(?, ?)', [userId, questId], function(err) {
         if (err == null) {
             console.log(`Inserted user to quest ${userId} quest: ${questId}`)
+        } else {
+            console.log(err)
+        }
+    });
+}
+
+function unassignUserFromQuest(userId, questId) {
+    db.run('DELETE FROM UserQuest WHERE userId = ?, questId = ?', [userId, questId], function(err) {
+        if (err == null) {
+            console.log(`Deleted user <-> quest connection, user: ${userId} quest: ${questId}`)
         } else {
             console.log(err)
         }
