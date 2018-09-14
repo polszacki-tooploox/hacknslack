@@ -79,7 +79,8 @@ app.post('/', (req, res) => {
             let quest = {
                 description: data.description,
                 xp: data.exp,
-                name: data.name
+                name: data.name,
+                usersLimit: data.heroesLimit
             }
             database.upsertQuest(quest, (newQuestId) => {
                 database.getQuest(newQuestId, (quest) => {

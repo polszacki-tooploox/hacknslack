@@ -7,7 +7,6 @@ module.exports = {
     }
 };
 
-
 let interval = 60 * 1000 * 30 // 30m
 
 function fetchWithInterval(callback) {
