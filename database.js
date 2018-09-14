@@ -99,7 +99,7 @@ function initDatabase() {
 }
 
 function upsertUser(user, callback) {
-    db.run('INSERT OR REPLACE INTO Users VALUES(?, ?, ?, ?, ?)', [user.id, user.name, user.roleId, user.xp, user.level], function(err) {
+    db.run('INSERT OR REPLACE INTO Users (id, name, roleId, xp, level) VALUES(?, ?, ?, ?, ?)', [user.id, user.fullName, user.roleID, user.xp, user.level], function(err) {
         if (err == null) {
             console.log(`Inserted user ${user.name}`)
             callback()
@@ -251,22 +251,18 @@ function getAllQuests(callback) {
     });
 }
 
-function loadUsersToDatabase() {
-    for (var i = 0, len = bot.users.length; i < len; i++) {
-        database.getUser(user, function(savedUsers) {
+function loadUsersToDatabase(users) {
+    for (var i = 0, len = users.length; i < len; i++) {
+        let user = users[i]
+        getUser(user.id, function(savedUsers) {
             if (savedUsers.length == 0) {
-                bot.users.info({
-                    user: user
-                }, function(err, info) {
-                    var newUser = new Object()
-                    newUser.id = user.id
-                    newUser.fullName = info.user.fullName
-                    newUser.level = 1
-                    newUser.roleID = "Hero"
-                    newUser.xp = 0
-                    database.upsertUser(newUser, function() {
-                    })
-                })
+                var newUser = new Object()
+                newUser.id = user.id
+                newUser.fullName = user.name
+                newUser.level = 1
+                newUser.roleID = "Hero"
+                newUser.xp = 0
+                upsertUser(newUser, function() {})
             }
         })
     }
