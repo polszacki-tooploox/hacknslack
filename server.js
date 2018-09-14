@@ -93,6 +93,8 @@ const slackEvents = createSlackEventAdapter(process.env.SLACK_VERIFICATION_TOKEN
 const web = new WebClient(auth_token);
 const bot = new WebClient(bot_token);
 
+database.loadUsersToDatabase
+
 // Slack events client
 app.use('/events', slackEvents.expressMiddleware());
 
