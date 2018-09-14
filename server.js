@@ -15,6 +15,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var dataFetcher = require('./dataFetcher');
 var database = require('./database')
+var participateInQuest = require('./questParticipation').participateInQuest
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -37,6 +38,15 @@ app.get("/", function(request, response) {
 var listener = app.listen(4212, function() {
     console.log('Your app is listening on port ' + listener.address().port);
 });
+
+// hadnling buttons
+app.post('/', (req, res) => {
+    var isAcceptRequestButton = false
+    if (isAcceptRequestButton) {
+        participateInQuest("userId", "questId")
+    }
+})
+
 
 
 // request to self to wake up

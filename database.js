@@ -26,6 +26,9 @@ module.exports = {
     getAllQuests: function(numberOfUsers, callback) {
         getAllQuests(numberOfUsers, callback)
     },
+    getQuest: function(questId, callback) {
+        getQuest(questId, callback)
+    },
     getUserQuests: function(userId, callback) {
         getUserQuests(userId, callback)
     },
@@ -200,6 +203,18 @@ function getUserAchievements(userId, callback) {
 
 function getUserQuests(userId, callback) {
     db.all('SELECT ua.questId FROM UserQuest WHERE userId = ?', [userId], function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getQuest(questId, callback) {
+    db.all('SELECT * FROM Quests WHERE id = ?', [questId], function(err, rows) {
         if (rows) {
             callback(rows)
         } else if (err) {
