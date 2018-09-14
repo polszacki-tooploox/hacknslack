@@ -81,7 +81,6 @@ function questAttachmentsLimitsReached(message, userIds, questId) {
             attachment_type: "default",
             actions: [
               {
-                {
                 name: "ignore",
                 style: "danger",
                 text: "Ignore",
