@@ -41,12 +41,18 @@ var listener = app.listen(4212, function() {
 
 // hadnling buttons
 app.post('/', (req, res) => {
-    var isAcceptRequestButton = false
-    if (isAcceptRequestButton) {
-        participateInQuest("userId", "questId")
+    switch (req.body.type) {
+        case 'interactive_message':
+            switch (req.body.callback_id) {
+                case 'new_quest':
+                    handleQuestAcceptance(req.body.user.id, req.body.actions[0].value)
+            }
     }
 })
 
+function handleQuestAcceptance(userId, questId) {
+    participateInQuest(userId, questId)
+}
 
 
 // request to self to wake up
