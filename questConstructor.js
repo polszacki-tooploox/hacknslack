@@ -66,3 +66,28 @@ function questAttachmentsAccepted(message, userIds, questId) {
         ]
     }]
 }
+
+function questAttachmentsLimitsReached(message, userIds, questId) {
+  let users = userIds.map( (userId) => {
+    return `<@${userId.userId}>, `
+  })
+  let acceptedMessage = `\n ${users} accepted the quest! Good luck on your adventure!`
+
+  return [{
+            text: `${message}` + acceptedMessage,
+            fallback: "You are unable to accept the quest",
+            callback_id: "new_quest",
+            color: "#3AA3E3",
+            attachment_type: "default",
+            actions: [
+              {
+                {
+                name: "ignore",
+                style: "danger",
+                text: "Ignore",
+                type: "button",
+                value: `${questId}`
+              }
+        ]
+    }]
+}
