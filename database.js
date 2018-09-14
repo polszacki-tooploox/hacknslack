@@ -40,7 +40,7 @@ module.exports = {
     },
     getUser: function(userId, callback) {
         getUser(userId, callback)
-    }
+    }, loadUsersToDatabase
 };
 
 // init sqlite db
