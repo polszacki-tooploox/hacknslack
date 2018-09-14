@@ -1,46 +1,20 @@
 module.exports = {
-    init: function() {
-        initDatabase()
-    },
-    upsertUser: function(user, callback) {
-        upsertUser(user, callback)
-    },
-    upsertAchievement: function(achievement, callback) {
-        upsertAchievement(achievement, callback)
-    },
-    upsertQuest: function(quest, callback) {
-        upsertQuest(quest, callback)
-    },
-    updateUserXPAndLevel: function(xp, level) {
-        updateUserXPAndLevel(xp, level)
-    },
-    assignAchievementToUser: function(userId, achievementId) {
-        assignAchievementToUser(userId, achievementId)
-    },
-    assignUserToQuest: function(userId, questId) {
-        assignUserToQuest(userId, questId)
-    },
-    getAllAchievements: function(callback) {
-        getAllAchievements(callback)
-    },
-    getAllQuests: function(numberOfUsers, callback) {
-        getAllQuests(numberOfUsers, callback)
-    },
-    getQuest: function(questId, callback) {
-        getQuest(questId, callback)
-    },
-    getUserQuests: function(userId, callback) {
-        getUserQuests(userId, callback)
-    },
-    getUserAchievements: function(userId, callback) {
-        getUserAchievements(userId, callback)
-    },
-    getAllUsers: function(callback) {
-        getAllUsers(callback)
-    },
-    getUser: function(userId, callback) {
-        getUser(userId, callback)
-    }, loadUsersToDatabase
+    initDatabase,
+    upsertAchievement,
+    upsertQuest,
+    updateUserXPAndLevel,
+    assignAchievementToUser,
+    assignUserToQuest,
+    unassignUserFromQuest,
+    getAllAchievements,
+    getAllQuests,
+    getQuest,
+    getUserQuests,
+    getUserAchievements,
+    getAllUsers,
+    getUser,
+    loadUsersToDatabase,
+    getQuestUsers
 };
 
 // init sqlite db
@@ -76,7 +50,8 @@ function initDatabase() {
                 id INTEGER PRIMARY KEY, \
                 name TEXT, \
                 xp INT, \
-                description TEXT)'
+                description TEXT, \
+                usersLimit: INT)'
             );
             console.log('New table Quest created!');
 
@@ -121,7 +96,7 @@ function upsertAchievement(achievement, callback) {
 }
 
 function upsertQuest(quest, callback) {
-    db.run('INSERT OR REPLACE INTO Quest (name, xp, description) VALUES(?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description], function(err) {
+    db.run('INSERT OR REPLACE INTO Quest (name, xp, description) VALUES(?, ?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description, quest.usersLimit], function(err) {
         if (err == null) {
             console.log(`Inserted quest ${quest.name}`)
             callback(this.lastID)
@@ -131,11 +106,20 @@ function upsertQuest(quest, callback) {
     });
 }
 
-function assignUserToQuest(userId, questId, callback) {
+function assignUserToQuest(userId, questId) {
     db.run('INSERT OR REPLACE INTO UserQuest VALUES(?, ?)', [userId, questId], function(err) {
         if (err == null) {
             console.log(`Inserted user to quest ${userId} quest: ${questId}`)
-            callback()
+        } else {
+            console.log(err)
+        }
+    });
+}
+
+function unassignUserFromQuest(userId, questId) {
+    db.run('DELETE FROM UserQuest WHERE userId = ?, questId = ?', [userId, questId], function(err) {
+        if (err == null) {
+            console.log(`Deleted user <-> quest connection, user: ${userId} quest: ${questId}`)
         } else {
             console.log(err)
         }
@@ -202,7 +186,19 @@ function getUserAchievements(userId, callback) {
 }
 
 function getUserQuests(userId, callback) {
-    db.all('SELECT ua.questId FROM UserQuest WHERE userId = ?', [userId], function(err, rows) {
+    db.all('SELECT questId FROM UserQuest WHERE userId = ?', [userId], function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
+function getQuestUsers(questId, callback) {
+    db.all('SELECT userId FROM UserQuest WHERE questId = ?', [questId], function(err, rows) {
         if (rows) {
             callback(rows)
         } else if (err) {

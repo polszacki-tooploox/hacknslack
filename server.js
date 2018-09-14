@@ -16,8 +16,10 @@ var bodyParser = require('body-parser');
 var dataFetcher = require('./dataFetcher');
 var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
+var heroReportHanler = require('./heroReportHandler')
 var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
+var ignoreQuest = require('./questParticipation').ignoreQuest
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -40,6 +42,10 @@ app.post('/quest', (req, res) => {
   addQuestRequestHandler.handleRequest(req, res)
 });
 
+app.post('/check-hero', (req, res) => {
+    heroReportHanler.heroReportAnswer(req, res)
+  });
+
 // listen for requests :)
 var listener = app.listen(4212, function() {
     console.log('Your app is listening on port ' + listener.address().port);
@@ -52,14 +58,29 @@ app.post('/', (req, res) => {
         case 'interactive_message':
             switch (payload.callback_id) {
                 case 'new_quest':
-                    handleQuestAcceptance(payload.user.id, payload.actions[0].value)
+                    var questId = payload.actions[0].value
+                    if (payload.actions[0] == "accept") {
+                        handleQuestAcceptance(payload.user.id, questId)
+                    } else {
+                        handleQuestIgnore(payload.user.id, questId)
+                    }
+                    database.getQuest(questId, (quest) => {
+                        database.getQuestUsers(questId, (userIds) => {
+                            var message = questConstructor.questMessage(quest)
+                            var attachment = questConstructor.questAttachmentsAccepted(message, userIds)
+                            res.send('')
+                            updateMessage(payload.channel.id, attachment, payload.message_ts)
+                        })
+                    })
             }
+            break
         case 'dialog_submission':
             var data = payload.submission
             let quest = {
                 description: data.description,
                 xp: data.exp,
-                name: data.name
+                name: data.name,
+                usersLimit: data.heroesLimit
             }
             database.upsertQuest(quest, (newQuestId) => {
                 database.getQuest(newQuestId, (quest) => {
@@ -69,6 +90,7 @@ app.post('/', (req, res) => {
                     sendMessage("hacknslack", attachment)
                 })
             })
+            break
     }
 })
 
@@ -76,6 +98,9 @@ function handleQuestAcceptance(userId, questId) {
     participateInQuest(userId, questId)
 }
 
+function handleQuestIgnore(userId, questId) {
+    unassignUserFromQuest(userId, questId)
+}
 
 // request to self to wake up
 var request = require("request")
@@ -137,3 +162,11 @@ function sendMessage(channel, attachment) {
             console.log(data)
         })
 }
+
+function updateMessage(channel, attachment, timestamp) {
+    bot.chat.update({
+        channel: channel,
+        attachments: attachment,
+        ts: timestamp
+    })
+}   

@@ -54,6 +54,14 @@ function handleRequest(request, response) {
               { label: '1500 xp', value: 1500 },
             ],
           },
+          {
+            label: 'Number of heroes',
+            type: 'text',
+            subtype: 'number',
+            name: 'heroesLimit',
+            value: 1,
+            hint: 'Number of heroes needed',
+          },
         ],
       }),
     };
