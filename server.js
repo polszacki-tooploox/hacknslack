@@ -17,6 +17,7 @@ var dataFetcher = require('./dataFetcher');
 var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
 var questConstructor = require('./questConstructor')
+var participateInQuest = require('./questParticipation').participateInQuest
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -47,6 +48,21 @@ app.post('/', (req, res) => {
 var listener = app.listen(4212, function() {
     console.log('Your app is listening on port ' + listener.address().port);
 });
+
+// hadnling buttons
+app.post('/', (req, res) => {
+    switch (req.body.type) {
+        case 'interactive_message':
+            switch (req.body.callback_id) {
+                case 'new_quest':
+                    handleQuestAcceptance(req.body.user.id, req.body.actions[0].value)
+            }
+    }
+})
+
+function handleQuestAcceptance(userId, questId) {
+    participateInQuest(userId, questId)
+}
 
 
 // request to self to wake up

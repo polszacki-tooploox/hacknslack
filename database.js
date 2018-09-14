@@ -26,6 +26,9 @@ module.exports = {
     getAllQuests: function(numberOfUsers, callback) {
         getAllQuests(numberOfUsers, callback)
     },
+    getQuest: function(questId, callback) {
+        getQuest(questId, callback)
+    },
     getUserQuests: function(userId, callback) {
         getUserQuests(userId, callback)
     },
@@ -210,6 +213,18 @@ function getUserQuests(userId, callback) {
     });
 }
 
+function getQuest(questId, callback) {
+    db.all('SELECT * FROM Quests WHERE id = ?', [questId], function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+
 function getAllAchievements(callback) {
     db.all('SELECT u.id, u.name, u.description, u.icon FROM Achievements', function(err, rows) {
         if (rows) {
@@ -234,4 +249,25 @@ function getAllQuests(callback) {
             console.log("what")
         }
     });
+}
+
+function loadUsersToDatabase() {
+    for (var i = 0, len = bot.users.length; i < len; i++) {
+        database.getUser(user, function(savedUsers) {
+            if (savedUsers.length == 0) {
+                bot.users.info({
+                    user: user
+                }, function(err, info) {
+                    var newUser = new Object()
+                    newUser.id = user.id
+                    newUser.fullName = info.user.fullName
+                    newUser.level = 1
+                    newUser.roleID = "Hero"
+                    newUser.xp = 0
+                    database.upsertUser(newUser, function() {
+                    })
+                })
+            }
+        })
+    }
 }
