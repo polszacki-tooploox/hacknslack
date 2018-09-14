@@ -1,10 +1,6 @@
 module.exports = {
-  questMessage(quest) {
-    questMessage(quest)
-  },
-  buttonAttachments() {
-    buttonAttachments()
-  }
+  questMessage,
+  questAttachments
 };
 
 function questMessage(quest) {
