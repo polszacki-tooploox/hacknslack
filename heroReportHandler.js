@@ -1,5 +1,7 @@
 module.exports = {
-    heroReportAnswer
+    heroReportAnswer(userId, callback){
+        heroReportAnswer(userId, callback)
+    }
 };
 
 var database = require("./database")
