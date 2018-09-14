@@ -235,3 +235,24 @@ function getAllQuests(callback) {
         }
     });
 }
+
+function loadUsersToDatabase() {
+    for (var i = 0, len = bot.users.length; i < len; i++) {
+        database.getUser(user, function(savedUsers) {
+            if (savedUsers.length == 0) {
+                bot.users.info({
+                    user: user
+                }, function(err, info) {
+                    var newUser = new Object()
+                    newUser.id = user.id
+                    newUser.fullName = info.user.fullName
+                    newUser.level = 1
+                    newUser.roleID = "Hero"
+                    newUser.xp = 0
+                    database.upsertUser(newUser, function() {
+                    })
+                })
+            }
+        })
+    }
+}
