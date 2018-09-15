@@ -252,12 +252,12 @@ var eventType = {
   
   function showAlarmAchievement(userId, channel) {
     let achievement = achievementsConstructor.alarmAchievement()
-    addAchievement(achievement)
+    addAchievement(userId, channel,achievement)
   }
 
   function showSpaceInvaderAchievement(userId, channel) {
       let achievement = achievementsConstructor.spaceInvaderAchievement()
-      addAchievement(achievement)
+      addAchievement(userId, channel,achievement)
   }
 
   function addAchievement(userId, channel, achievement) {

@@ -203,7 +203,12 @@ function getUserQuests(userId, callback) {
 }
 
 function getQuestUsers(questId, callback) {
-    db.all('SELECT userId FROM UserQuest WHERE questId = ?', [questId], function(err, rows) {
+    // 'select *
+    // from routes
+    // where id in (select allowed_ids
+    //              from users
+    //              where username = 'sameple')'
+    db.all('SELECT * FROM Users WHERE id IN (SELECT userID FROM UserQuest WHERE questId = ?)', [questId], function(err, rows) {
         if (rows) {
             callback(rows)
         } else if (err) {

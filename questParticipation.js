@@ -99,8 +99,8 @@ function checkIfUserIsParticipating(userId, questId, callback) {
 
 function calculateLevel(xp) {
     return xpLevels.findIndex((element) => {
-        return xp < element
-    }) +1
+        return xp <= element
+    }) + 1
 }
 
 function userDidLevelUp(userId, level) {
