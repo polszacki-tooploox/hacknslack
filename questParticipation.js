@@ -1,13 +1,27 @@
 module.exports = {
     participateInQuest,
-    ignoreQuest
+    ignoreQuest,
+    checkIfQuestIsFull
 };
 
 var database = require("./database")
 
+function checkIfQuestIsFull(questId, callback) {
+  
+  database.getQuestUsers(questId, (questUserIds) => {
+    database.getQuest(questId, (quest) => {
+        if (quest.usersLimit == questUserIds.length) {
+          callback(true)
+        } else {
+          callback(false)
+        }
+     })
+  })
+}
+
 function participateInQuest(userId, questId) {
 
-    isUserParticipating(userId, questId, (isParticipating) => {
+    checkIfUserIsParticipating(userId, questId, (isParticipating) => {
       
       if (isParticipating) {
         return
@@ -29,7 +43,7 @@ function participateInQuest(userId, questId) {
 
 function ignoreQuest(userId, questId) {
   
-      isUserParticipating(userId, questId, (isParticipating) => {
+      checkIfUserIsParticipating(userId, questId, (isParticipating) => {
       
         if (!isParticipating) {
           return
@@ -50,7 +64,7 @@ function ignoreQuest(userId, questId) {
       })
 }
 
-function isUserParticipating(userId, questId, callback) {
+function checkIfUserIsParticipating(userId, questId, callback) {
 
     database.getQuestUsers(questId, (questUserIds) => {
       
