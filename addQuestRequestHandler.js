@@ -5,10 +5,19 @@ module.exports = {
 const axios = require('axios');
 const apiUrl = 'https://slack.com/api';
 const qs = require('querystring');
+var questTemplates = require('./questTemplates')
 
 function handleRequest(request, response) {
   // extract the slash command text, and trigger ID from payload
   const { text, trigger_id } = request.body;
+  var name = text
+  var desc = ""
+  if (questTemplates.templates(text)){
+    var quest = questTemplates.templates(text)
+    text = quest[0]
+    desc = quest[1]
+  }
+  
 
   // Verify the signing secret
     console.log('Verified');
@@ -26,13 +35,14 @@ function handleRequest(request, response) {
             label: 'Name',
             type: 'text',
             name: 'name',
-            value: text,
+            value: name,
             hint: 'Name of the quest',
           },
           {
             label: 'Description',
             type: 'textarea',
             name: 'description',
+            value: desc,
             optional: true,
             hint: 'Quest description',
           },
