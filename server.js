@@ -101,7 +101,7 @@ function handleQuestAcceptance(userId, questId) {
 }
 
 function handleQuestIgnore(userId, questId) {
-    database.unassignUserFromQuest(userId, questId)
+    ignoreQuest(userId, questId)
 }
 
 // request to self to wake up

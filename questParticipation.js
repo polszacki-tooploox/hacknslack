@@ -35,9 +35,17 @@ function ignoreQuest(userId, questId) {
           return
         }
         
-        database.UassignUserToQuest(userId, questId)
-
-        
+        database.unassignUserFromQuest(userId, questId)
+        database.getUser(userId, (user) => {
+          database.getQuest(questId, (quest) => {
+            var currentXP = user.xp
+            if (currentXP == null) {
+                currentXP = 0
+            }
+            var currentLevel = calculateLevel(currentXP)
+            database.updateUserXPAndLevel(userId, currentXP - quest[0].xp, currentLevel)
+          })
+        })
       
       })
 }
