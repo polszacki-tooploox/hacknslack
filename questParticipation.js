@@ -1,14 +1,15 @@
 module.exports = {
-    participateInQuest
+    participateInQuest,
+    ignoreQuest
 };
 
 var database = require("./database")
 
 function participateInQuest(userId, questId) {
-    
-    database.getQuestUsers(questId, (dbUserId) => {
 
-      if (dbUserId.includes(userId)) {
+    isUserParticipating(userId, questId, (isParticipating) => {
+      
+      if (isParticipating) {
         return
       }
       
@@ -23,6 +24,37 @@ function participateInQuest(userId, questId) {
             database.updateUserXPAndLevel(userId, currentXP + quest[0].xp, currentLevel)
         })
       })
+    })
+}
+
+function ignoreQuest(userId, questId) {
+  
+      isUserParticipating(userId, questId, (isParticipating) => {
+      
+        if (!isParticipating) {
+          return
+        }
+        
+        database.UassignUserToQuest(userId, questId)
+
+        
+      
+      })
+}
+
+function isUserParticipating(userId, questId, callback) {
+
+    database.getQuestUsers(questId, (questUserIds) => {
+      
+      let userIds =  questUserIds.map( (userId) => {
+        return userId.userId
+      })
+    
+      if (userIds.includes(userId)) {
+        callback(true)
+      } else {
+        callback(false)
+      }
     })
 }
 
