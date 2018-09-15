@@ -12,3 +12,11 @@ function achievementAttachments(achievement) {
             thumb_url: `${achievement.icon}`
     }]
 }
+
+function spaceInvaderAttachemnts() {
+  let achievemnt = {
+    name: "Space Invader",
+    description: "",
+    icon: "https://image.flaticon.com/icons/png/512/280/280761.png"
+  }
+}

@@ -1,6 +1,12 @@
 // server.js
 // where your node app starts
 
+var eventType = {
+  levelUp: "levelUp",
+  questMade: "questMade",
+  questCreated: "questCreated"
+}
+
 // init project
 var express = require('express');
 var bodyParser = require('body-parser');
@@ -80,9 +86,9 @@ app.post('/', (req, res) => {
                     var message = questConstructor.questMessage(quest)
                     var attachment = questConstructor.questAttachments(message, newQuestId)
                     res.send('')
-                    console.log(events.eventType.questCreated)
+                    console.log(eventType.questCreated)
                     var eventJson = events.eventCreator({
-                        type: events.eventType.questCreated
+                        type: eventType.questCreated
                     }, {}, {newQuestId})
                     console.log(eventJson)
                     database.insertEvent(JSON.stringify(eventJson))

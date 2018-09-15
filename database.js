@@ -70,7 +70,7 @@ function initDatabase() {
                 PRIMARY KEY(userId, achievementId) \
             )')
           
-            db.run('CREATE TABLE Event (id INTEGER PRIMARY KEY, data: TEXT)')
+            db.run('CREATE TABLE Event (id INTEGER PRIMARY KEY, data TEXT)')
             console.log('New tables created!');
         } else {
             console.log('Database is ready to go!');
