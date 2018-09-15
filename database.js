@@ -14,7 +14,9 @@ module.exports = {
     getAllUsers,
     getUser,
     loadUsersToDatabase,
-    getQuestUsers
+    getQuestUsers,
+    insertEvent,
+    getEvents
 };
 
 // init sqlite db
@@ -98,7 +100,7 @@ function upsertAchievement(achievement, callback) {
 }
 
 function upsertQuest(quest, callback) {
-    db.run('INSERT OR REPLACE INTO Quest (name, xp, description, usersLimit) VALUES(?, ?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description, quest.usersLimit], function(err) {
+    db.run('INSERT OR REPLACE INTO Quest (id, name, xp, description, usersLimit) VALUES(?, ?, ?, ?, ?)', [quest.id, quest.name, parseInt(quest.xp), quest.description, quest.usersLimit], function(err) {
         if (err == null) {
             console.log(`Inserted quest ${quest.name}`)
             callback(this.lastID)
@@ -267,5 +269,25 @@ function loadUsersToDatabase(users) {
 }
 
 function insertEvent(jsonData) {
-    var data = 
+    var data = JSON.stringify(jsonData)
+    db.run('INSERT OR REPLACE INTO Event (data) VALUES(?)', [data], function(err) {
+        if (err == null) {
+            console.log(`Inserted event ${data}`)
+        } else {
+            console.log(err)
+        }
+    });
 }
+
+function getEvents(callback) {
+    db.all('SELECT * FROM Event', function(err, rows) {
+        if (rows) {
+            callback(rows)
+        } else if (err) {
+            console.log(err)
+        } else {
+            console.log("what")
+        }
+    });
+}
+

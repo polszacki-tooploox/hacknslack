@@ -47,6 +47,8 @@ var listener = app.listen(4212, function() {
 // hadnling buttons
 app.post('/', (req, res) => {
     var payload = JSON.parse(req.body.payload)
+    console.log(req.body)
+    return
     switch (payload.type) {
         case 'interactive_message':
             switch (payload.callback_id) {
@@ -61,6 +63,7 @@ app.post('/', (req, res) => {
             let parsedLimit = parseInt(data.heroesLimit)
             let usersLimit = data.heroesLimit == null || isNaN(parsedLimit) ? 999 : parsedLimit
             let quest = {
+                id: data.ts,
                 description: data.description,
                 xp: data.exp,
                 name: data.name,
@@ -169,8 +172,6 @@ slackEvents.on('reaction_added', (event) => {
 function sendMessage(channel, attachment) {
 
     // Send message using Slack Web Client
-    console.log(attachment)
-    console.log(channel)
     bot.chat.postMessage({
             channel: channel,
             attachments: attachment,
@@ -183,7 +184,6 @@ function sendMessage(channel, attachment) {
 function sendMessageWithoutAttachment(channel, message, userId) {
 
     // Send message using Slack Web Client
-    console.log(channel)
     bot.chat.postEphemeral({
             text: message,
             channel: channel,
