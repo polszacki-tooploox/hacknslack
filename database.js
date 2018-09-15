@@ -36,7 +36,8 @@ function initDatabase() {
                 name TEXT,\
                 roleId TEXT,\
                 xp INT, \
-                level INT)'
+                level INT, \
+                avatarURL TEXT)'
             );
             console.log('New table Users created!');
 
@@ -79,7 +80,7 @@ function initDatabase() {
 }
 
 function upsertUser(user, callback) {
-    db.run('INSERT OR REPLACE INTO Users (id, name, roleId, xp, level) VALUES(?, ?, ?, ?, ?)', [user.id, user.fullName, user.roleID, user.xp, user.level], function(err) {
+    db.run('INSERT OR REPLACE INTO Users (id, name, roleId, xp, level) VALUES(?, ?, ?, ?, ?, ?)', [user.id, user.fullName, user.roleID, user.xp, user.level, user.avatarURL], function(err) {
         if (err == null) {
             console.log(`Inserted user ${user.id}`)
             callback()
@@ -179,7 +180,7 @@ function getUser(userId, callback) {
 }
 
 function getUserAchievements(userId, callback) {
-    db.all('SELECT ua.achievementId FROM UserAchievement WHERE userId = ?', [userId], function(err, rows) {
+    db.all('SELECT * FROM UserAchievement WHERE userId = ?', [userId], function(err, rows) {
         if (rows) {
             callback(rows)
         } else if (err) {
@@ -267,6 +268,7 @@ function loadUsersToDatabase(users) {
                 newUser.fullName = user.name
                 newUser.level = 1
                 newUser.roleID = "Hero"
+                newUser.avatarURL = user.profile.image_192
                 newUser.xp = 0
                 upsertUser(newUser, function() {})
             }
