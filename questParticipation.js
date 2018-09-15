@@ -1,8 +1,7 @@
 module.exports = {
     participateInQuest,
     ignoreQuest,
-    checkQuestStatus,
-    addXpForEmote
+    checkQuestStatus
 };
 
 var database = require("./database")
@@ -79,12 +78,6 @@ function checkIfUserIsParticipating(userId, questId, callback) {
         callback(false)
       }
     })
-}
-
-function addXpForReaction(userId, reaction) {
-  if (reaction == "coin") {
-    updateXP(user, 1)
-  }
 }
 
 function calculateLevel(xp) {

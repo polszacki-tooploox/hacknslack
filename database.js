@@ -54,8 +54,7 @@ function initDatabase() {
                 xp INT, \
                 description TEXT, \
                 usersLimit INT, \
-                messageTimestamp TEXT, \
-                reactionAdded BOOLEAN)'
+                messageTimestamp TEXT)'
             );
             console.log('New table Quest created!');
 
