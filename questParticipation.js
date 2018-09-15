@@ -1,7 +1,8 @@
 module.exports = {
     participateInQuest,
     ignoreQuest,
-    checkQuestStatus
+    checkQuestStatus,
+    addXpForEmote
 };
 
 var database = require("./database")
@@ -32,12 +33,7 @@ function participateInQuest(userId, questId) {
       database.assignUserToQuest(userId, questId)
       database.getUser(userId, (user) => {
         database.getQuest(questId, (quest) => {
-            var currentXP = user.xp
-            if (currentXP == null) {
-                currentXP = 0
-            }
-            var currentLevel = calculateLevel(currentXP)
-            database.updateUserXPAndLevel(userId, currentXP + quest[0].xp, currentLevel)
+            updateXP(user, quest[0].xp)
         })
       })
     })
@@ -54,16 +50,19 @@ function ignoreQuest(userId, questId) {
         database.unassignUserFromQuest(userId, questId)
         database.getUser(userId, (user) => {
           database.getQuest(questId, (quest) => {
-            var currentXP = user.xp
-            if (currentXP == null) {
-                currentXP = 0
-            }
-            var currentLevel = calculateLevel(currentXP)
-            database.updateUserXPAndLevel(userId, currentXP - quest[0].xp, currentLevel)
+            updateXP(user, -quest[0].xp)
           })
         })
-      
       })
+}
+
+function updateXP(user, xp) {
+  var currentXP = user.xp
+  if (currentXP == null) {
+      currentXP = 0
+  }
+  var currentLevel = calculateLevel(currentXP)
+  database.updateUserXPAndLevel(user.id, currentXP + xp, currentLevel)
 }
 
 function checkIfUserIsParticipating(userId, questId, callback) {
@@ -80,6 +79,12 @@ function checkIfUserIsParticipating(userId, questId, callback) {
         callback(false)
       }
     })
+}
+
+function addXpForReaction(userId, reaction) {
+  if (reaction == "coin") {
+    updateXP(user, 1)
+  }
 }
 
 function calculateLevel(xp) {

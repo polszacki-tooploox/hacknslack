@@ -1,8 +1,40 @@
+module.exports = {
+    eventType,
+    eventMetadata,
+    eventCreator
+}
+
 var eventType = {
   levelUp: "levelUp",
-  questMade: 
+  questMade: "questMade",
+  questCreated: "questCreated"
+}
+
+var eventMetadata = {
+  type: "",
+  associatedData: ""
 }
 
 
-function eventCreator(type, user, quest) {
+function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
+  switch (eventMetadata.type) {
+    case eventType.levelUp:
+      return {
+        userId: userEventMetadata.userId,
+        questId: null,
+        message: `Gained new level`
+      }
+    case eventType.questMade:
+      return {
+        userId: userEventMetadata.userId,
+        questId: questEventMetadata.questId,
+        message: `Joined quest`
+      }
+    case eventType.questCreated:
+      return {
+        userId: null,
+        questId: questEventMetadata.questId,
+        message: `Joined quest`
+      }
+  }
 }

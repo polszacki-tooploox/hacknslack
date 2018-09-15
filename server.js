@@ -74,7 +74,7 @@ app.post('/', (req, res) => {
                     res.send('')
                     sendMessage("hacknslack", attachment, (ts) => {
                       quest.messageTimestamp = ts
-                      database.upsertQuest(quest, {})
+                      database.upsertQuest(quest, ()=>{})
                     })
                 })
             })
