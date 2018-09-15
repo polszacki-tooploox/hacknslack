@@ -31,10 +31,10 @@ database.initDatabase()
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
-app.get("/bot_events", (request, response) => {
+app.get("/bot_events", (request, res) => {
   events.createEventsResponse((eventsJSON) => {
-    console.log(eventsJSON)
-    response.json(eventsJSON)
+    console.log("WYSYLAM")
+    res.send(eventsJSON);
   })
 })
 
