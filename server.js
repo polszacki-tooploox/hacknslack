@@ -162,8 +162,8 @@ slackEvents.on('message', (event) => {
     console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
 });
 
-slackEvents.on('app_mention', (event) => {
-    console.log(`Received a mention event: user ${event.user} in channel ${event.channel} says ${event.text}`);
+slackEvents.on('reaction_added', (event) => {
+    console.log(`Reaction added: user ${event.user} in channel ${event.item.channel} reaction: ${event.reaction}`);
 });
 
 function sendMessage(channel, attachment) {
