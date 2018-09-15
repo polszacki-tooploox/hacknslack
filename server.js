@@ -139,7 +139,13 @@ var eventType = {
   }
   
   function handleQuestAcceptance(userId, questId) {
-      participateInQuest(userId, questId)
+
+    database.getQuest(questId, (quest) => {
+        if(quest.name = "Space Invader") {
+            showSpaceInvaderAchievement(userId, "hacknslack")
+        }
+    })
+    participateInQuest(userId, questId)
   }
   
   function handleQuestIgnore(userId, questId) {
@@ -245,7 +251,16 @@ var eventType = {
   
   
   function showAlarmAchievement(userId, channel) {
-      let achievement = achievementsConstructor.alarmAchievement()
+    let achievement = achievementsConstructor.alarmAchievement()
+    addAchievement(achievement)
+  }
+
+  function showSpaceInvaderAchievement(userId, channel) {
+      let achievement = achievementsConstructor.spaceInvaderAchievement()
+      addAchievement(achievement)
+  }
+
+  function addAchievement(userId, channel, achievement) {
       let attachment = achievementsConstructor.achievementAttachments(achievement)
     
       database.getUserAchievements(userId, (achievs) => {

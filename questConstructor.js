@@ -39,7 +39,7 @@ function questAttachments(message, questId) {
 
 function questAttachmentsAccepted(message, userIds, questId) {
   let users = userIds.map( (userId) => {
-    return `<@${userId.userId}>, `
+    return `<@${userId.userId}> `
   })
   let acceptedMessage = `\n ${users} accepted the quest! Good luck on your adventure!`
 
@@ -70,9 +70,9 @@ function questAttachmentsAccepted(message, userIds, questId) {
 
 function questAttachmentsLimitsReached(message, userIds, questId) {
   let users = userIds.map( (userId) => {
-    return `<@${userId.userId}>, `
+    return `<@${userId.userId}> `
   })
-  let acceptedMessage = `\n ${users} accepted the quest! Good luck on your adventure!`
+  let acceptedMessage = `\n ${users} accepted the quest! The team is full. Good luck on your adventure!`
 
   return [{
             text: `${message}` + acceptedMessage,
