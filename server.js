@@ -13,7 +13,6 @@ let minPoints = 3
 // init project
 var express = require('express');
 var bodyParser = require('body-parser');
-var dataFetcher = require('./dataFetcher');
 var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
 var heroReportHandler = require('./heroReportHandler')

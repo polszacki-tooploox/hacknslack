@@ -5,8 +5,15 @@ module.exports = {
 var database = require("./database")
 
 function participateInQuest(userId, questId) {
-    database.assignUserToQuest(userId, questId)
-    database.getUser(userId, (user) => {
+    
+    database.getQuestUsers(questId, (dbUserId) => {
+
+      if (dbUserId.includes(userId)) {
+        return
+      }
+      
+      database.assignUserToQuest(userId, questId)
+      database.getUser(userId, (user) => {
         database.getQuest(questId, (quest) => {
             var currentXP = user.xp
             if (currentXP == null) {
@@ -15,6 +22,7 @@ function participateInQuest(userId, questId) {
             var currentLevel = calculateLevel(currentXP)
             database.updateUserXPAndLevel(userId, currentXP + quest[0].xp, currentLevel)
         })
+      })
     })
 }
 

@@ -1,10 +1,5 @@
 module.exports = {
-  handleRequest(request, response) {
-    handleRequest(request, response)
-  },
-  handleDialogSumbition(request, response) {
-    handleDialogSumbition(request, response)
-  }
+  handleRequest
 };
 
 const axios = require('axios');
