@@ -1,14 +1,5 @@
 // server.js
 // where your node app starts
-let betKey = "bet"
-let matchesKey = "matches"
-let todayKey = "today"
-let topKey = "top"
-let couponsKey = "coupons"
-let helpKey = "help"
-let maxPoints = 8
-let minPoints = 3
-
 
 // init project
 var express = require('express');
@@ -19,6 +10,7 @@ var heroReportHandler = require('./heroReportHandler')
 var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
 var ignoreQuest = require('./questParticipation').ignoreQuest
+var checkQuestStatus = require('./questParticipation').checkQuestStatus
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -59,30 +51,20 @@ app.post('/', (req, res) => {
         case 'interactive_message':
             switch (payload.callback_id) {
                 case 'new_quest':
-                    var questId = payload.actions[0].value
-                    var didAccept = payload.actions[0].name == "accept"
-                    if (didAccept) {
-                        handleQuestAcceptance(payload.user.id, questId)
-                    } else {
-                        handleQuestIgnore(payload.user.id, questId)
-                    }
-                    database.getQuest(questId, (quest) => {
-                        database.getQuestUsers(questId, (userIds) => {
-                            var message = questConstructor.questMessage(quest)
-                            var attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
-                            res.send('')
-                            updateMessage(payload.channel.id, attachment, payload.message_ts)
-                        })
-                    })
+                  handleQuestInteraction(payload, res)
+                  break
             }
             break
         case 'dialog_submission':
             var data = payload.submission
+            // If not given, there is no limit
+            let parsedLimit = parseInt(data.heroesLimit)
+            let usersLimit = data.heroesLimit == null || isNaN(parsedLimit) ? 999 : parsedLimit
             let quest = {
                 description: data.description,
                 xp: data.exp,
                 name: data.name,
-                usersLimit: data.heroesLimit
+                usersLimit: usersLimit
             }
             database.upsertQuest(quest, (newQuestId) => {
                 database.getQuest(newQuestId, (quest) => {
@@ -95,6 +77,44 @@ app.post('/', (req, res) => {
             break
     }
 })
+
+function handleQuestInteraction(payload, res) {
+  var questId = payload.actions[0].value
+  var didAccept = payload.actions[0].name == "accept"
+  if (didAccept) {
+      handleQuestAcceptance(payload.user.id, questId)
+  } else {
+      handleQuestIgnore(payload.user.id, questId)
+  }
+
+  updateQuestMessage(payload, questId)
+  res.send('')
+}
+
+function updateQuestMessage(payload, questId) {
+  database.getQuest(questId, (quest) => {
+      database.getQuestUsers(questId, (userIds) => {
+        
+        checkQuestStatus(questId, (isFull, isEmpty) => {
+          var message = questConstructor.questMessage(quest)
+          var attachment = new Object()
+          if(isFull) {
+            console.log("isFull")
+            attachment = questConstructor.questAttachmentsLimitsReached(message, userIds, questId)
+          } else if(isEmpty) {
+            console.log("isEmpty")
+            attachment = questConstructor.questAttachments(message, questId)
+          } else {
+            console.log("not empty, not full")
+            attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
+          }
+          
+          updateMessage(payload.channel.id, attachment, payload.message_ts)
+        })
+        
+      })
+  })
+}
 
 function handleQuestAcceptance(userId, questId) {
     participateInQuest(userId, questId)
@@ -145,11 +165,6 @@ slackEvents.on('message', (event) => {
 slackEvents.on('app_mention', (event) => {
     console.log(`Received a mention event: user ${event.user} in channel ${event.channel} says ${event.text}`);
 });
-
-// This function is discussed in "Responding to actions" below
-function handlerFunction() {
-  Console.log("Received action")
-}
 
 function sendMessage(channel, attachment) {
 
