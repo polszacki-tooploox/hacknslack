@@ -50,7 +50,8 @@ app.post('/', (req, res) => {
         case 'interactive_message':
             switch (payload.callback_id) {
                 case 'new_quest':
-
+                  handleQuestInteraction(payload, res)
+                  break
             }
             break
         case 'dialog_submission':
@@ -73,7 +74,25 @@ app.post('/', (req, res) => {
     }
 })
 
-function handleQuestInteraction() {
+function handleQuestInteraction(payload, res) {
+  var questId = payload.actions[0].value
+  var didAccept = payload.actions[0].name == "accept"
+  if (didAccept) {
+      handleQuestAcceptance(payload.user.id, questId)
+  } else {
+      handleQuestIgnore(payload.user.id, questId)
+  }
+  database.getQuest(questId, (quest) => {
+      database.getQuestUsers(questId, (userIds) => {
+          var message = questConstructor.questMessage(quest)
+          var attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
+          res.send('')
+          updateMessage(payload.channel.id, attachment, payload.message_ts)
+      })
+  })
+}
+
+function updateQuestMessage() {
   
 }
 
