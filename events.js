@@ -22,18 +22,21 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
   switch (eventMetadata.type) {
     case eventType.levelUp:
       return {
+        type: eventMetadata.type,
         userId: userEventMetadata.userId,
         questId: null,
         message: `Gained new level ${eventMetadata.associatedData}`
       }
     case eventType.questMade:
       return {
+        type: eventMetadata.type,
         userId: userEventMetadata.userId,
         questId: questEventMetadata.questId,
         message: `Joined quest`
       }
     case eventType.questCreated:
       return {
+        type: eventMetadata.type,
         userId: null,
         questId: questEventMetadata.questId,
         message: `Joined quest`
