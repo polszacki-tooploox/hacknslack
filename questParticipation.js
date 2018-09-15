@@ -1,7 +1,7 @@
 module.exports = {
     participateInQuest,
     ignoreQuest,
-    xpLevels
+    xpLevels,
     checkQuestStatus
 };
 

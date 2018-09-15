@@ -16,7 +16,7 @@ function heroReportAnswer(req, res, callback){
     var max = levelThroshold(user.level)
     database.getUser(userId, (user) => {
       var responceMessage = `:space_invader: ${user.roleId}: ${user.name} \
-      \n:trophy: Level: ${user.level}\n:muscle: Exp.: ${user.xp} / ${max}`
+      \n:trophy: Level: ${user.level}\n:star2: Exp.: ${user.xp} / ${max}`
       callback (responceMessage)
   })
 
