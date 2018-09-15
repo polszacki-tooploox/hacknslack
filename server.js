@@ -57,12 +57,16 @@ app.post('/', (req, res) => {
             break
         case 'dialog_submission':
             var data = payload.submission
+            // If not given, there is no limit
+            let usersLimit = data.heroesLimit == null ? 999 : parseInt(data.heroesLimit)
             let quest = {
                 description: data.description,
                 xp: data.exp,
                 name: data.name,
-                usersLimit: data.heroesLimit
+                usersLimit: isNaN(usersLimit) ? 1 : usersLimit
             }
+            console.log(quest)
+          return
             database.upsertQuest(quest, (newQuestId) => {
                 database.getQuest(newQuestId, (quest) => {
                     var message = questConstructor.questMessage(quest)
