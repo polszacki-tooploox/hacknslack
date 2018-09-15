@@ -112,7 +112,6 @@ function updateQuestMessage(payload, questId) {
           
           updateMessage(payload.channel.id, attachment, payload.message_ts)
         })
-        
       })
   })
 }

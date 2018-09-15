@@ -38,5 +38,10 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
   }
 }
 
-function createEventsResponse() {
+function createEventsResponse(database) {
+  database.getEvents((events) => {
+    events.map((event) => {
+      
+    })
+  })
 }
