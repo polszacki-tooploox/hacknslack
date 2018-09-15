@@ -74,7 +74,7 @@ function updateXP(user, xp) {
       currentXP = 0
   }
   var previousLevel = user.level
-  var currentLevel = calculateLevel(currentXP)
+  var currentLevel = calculateLevel(currentXP + xp)
   database.updateUserXPAndLevel(user.id, currentXP + xp, currentLevel)
   if (previousLevel < currentLevel) {
       userDidLevelUp(user.id, currentLevel)

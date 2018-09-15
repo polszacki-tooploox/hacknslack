@@ -80,7 +80,7 @@ function initDatabase() {
 }
 
 function upsertUser(user, callback) {
-    db.run('INSERT OR REPLACE INTO Users (id, name, roleId, xp, level) VALUES(?, ?, ?, ?, ?, ?)', [user.id, user.fullName, user.roleID, user.xp, user.level, user.avatarURL], function(err) {
+    db.run('INSERT OR REPLACE INTO Users (id, name, roleId, xp, level, avatarURL) VALUES(?, ?, ?, ?, ?, ?)', [user.id, user.fullName, user.roleID, user.xp, user.level, user.avatarURL], function(err) {
         if (err == null) {
             console.log(`Inserted user ${user.id}`)
             callback()
