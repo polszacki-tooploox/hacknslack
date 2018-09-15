@@ -14,6 +14,7 @@ var database = require('./database')
 var addQuestRequestHandler = require('./addQuestRequestHandler')
 var heroReportHandler = require('./heroReportHandler')
 var questConstructor = require('./questConstructor')
+var achievementsConstructor = require('./achievementsConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
 var ignoreQuest = require('./questParticipation').ignoreQuest
 var checkQuestStatus = require('./questParticipation').checkQuestStatus
@@ -33,8 +34,8 @@ app.use(express.static('public'));
 
 app.get("/bot_events", (request, res) => {
   events.createEventsResponse((eventsJSON) => {
-    console.log("WYSYLAM")
-    res.send(eventsJSON);
+    console.log(`WYSYLAM: ${JSON.stringify(eventsJSON)}`)
+    res.send(JSON.stringify(eventsJSON));
   })
 })
 
@@ -243,5 +244,5 @@ function updateMessage(channel, attachment, timestamp) {
 
 
 function showAlarmAchievement(user, channel) {
-  
+  let achievement = ""
 }

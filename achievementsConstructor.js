@@ -1,5 +1,7 @@
 module.exports = {
-  achievementAttachments
+  achievementAttachments,
+  spaceInvaderAchievement,
+  alarmAchievement
 }
 
 function achievementAttachments(achievement) {

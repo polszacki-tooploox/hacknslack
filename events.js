@@ -48,15 +48,13 @@ function createEventsResponse(callback) {
   var counter = 1
   database.getEvents((events) => {
     events.map((event) => {
-      console.log(event)
+        console.log(event.data)
         var json = JSON.parse(event.data)
-        console.log(json)
         database.getUser(json.userId, (user => {
           database.getQuest(json.questId, (quest) => {
             database.getQuestUsers(json.questId, (users) => {
-                if (counter == events.lenght) {
-                  c
-                  callback(buildResponse(event, user, quest, users))
+                if (counter == events.length) {
+                  callback(buildResponse(json, user, quest, users))
                 } else {
                   counter++
                 }
@@ -69,11 +67,12 @@ function createEventsResponse(callback) {
 
 function buildResponse(event, user, quest, questUsers) {
   console.log(event)
-  console.log(quest)
+  console.log(event["type"])
   var response = {
-    type: event.type,
-    message: event.message
+    type: event["type"],
+    message: event["message"]
   }
+  console.log(response)
   if (user) {
     response.user = user
   }
