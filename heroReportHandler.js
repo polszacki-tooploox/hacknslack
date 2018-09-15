@@ -3,12 +3,13 @@ module.exports = {
 }
 
 var database = require("./database")
-var questParticipation = require("./questParticipation")
+var xpLevels = require("./questParticipation").xpLevels()
 
 function heroReportAnswer(req, res, callback){
     let userId = req.body.user_id
-    var max = questParticipation.xpLevels(user.level-1)
+    
     database.getUser(userId, (user) => {
+        var max = xpLevels[user.level-1]
         var responceMessage = `:alien: ${user.roleId}: ${user.name} \
         \n:trophy: Level: ${user.level}\n:star2: Exp.: ${user.xp} / ${max}`  
       callback (responceMessage)
