@@ -1,12 +1,13 @@
 module.exports = {
     participateInQuest,
     ignoreQuest,
-    xpLevels,
+    xpLevels: () => { return xpLevels },
     checkQuestStatus
 };
 
 var database = require("./database")
 var Events = require("./events")
+var eventType = require("./events").eventType()
 var xpLevels = [
   10,
   30,
@@ -104,7 +105,7 @@ function calculateLevel(xp) {
 
 function userDidLevelUp(userId, level) {
     var eventJson = Events.eventCreator({
-        type: Events.eventType.levelUp,
+        type: eventType.levelUp,
         associatedData: level
     }, {userId})
     database.insertEvent(JSON.stringify(eventJson))

@@ -1,5 +1,5 @@
 module.exports = {
-    eventType,
+    eventType: () => { return eventType },
     eventMetadata,
     eventCreator,
     createEventsResponse
@@ -46,15 +46,17 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
 
 function createEventsResponse(callback) {
   var counter = 1
+  var eventsArray = []
   database.getEvents((events) => {
     events.map((event) => {
-        console.log(event.data)
-        var json = JSON.parse(event.data)
+        var json = JSON.parse(JSON.parse(event.data))
         database.getUser(json.userId, (user => {
           database.getQuest(json.questId, (quest) => {
             database.getQuestUsers(json.questId, (users) => {
+                
+                eventsArray.push(buildResponse(json, user, quest, users))
                 if (counter == events.length) {
-                  callback(buildResponse(json, user, quest, users))
+                  callback(eventsArray)
                 } else {
                   counter++
                 }
@@ -74,13 +76,14 @@ function buildResponse(event, user, quest, questUsers) {
   }
   console.log(response)
   if (user) {
-    response.user = user
+    response.user = user[0]
   }
   if(quest) {
-    if(questUsers) {
-      quest.questUsers = questUsers
+    var evetnQuest = quest[0]
+    if(questUsers && evetnQuest) {
+      evetnQuest.questUsers = questUsers
     }
-    response.quest = quest
+    response.quest = evetnQuest
   }
   return response
 }
