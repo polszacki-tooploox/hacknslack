@@ -53,7 +53,8 @@ function initDatabase() {
                 name TEXT, \
                 xp INT, \
                 description TEXT, \
-                usersLimit INT)'
+                usersLimit INT, \
+                messageTimestamp TEXT)'
             );
             console.log('New table Quest created!');
 
@@ -100,7 +101,7 @@ function upsertAchievement(achievement, callback) {
 }
 
 function upsertQuest(quest, callback) {
-    db.run('INSERT OR REPLACE INTO Quest (id, name, xp, description, usersLimit) VALUES(?, ?, ?, ?, ?)', [quest.id, quest.name, parseInt(quest.xp), quest.description, quest.usersLimit], function(err) {
+    db.run('INSERT OR REPLACE INTO Quest (name, xp, description, usersLimit, messageTimestamp) VALUES(?, ?, ?, ?, ?)', [quest.name, parseInt(quest.xp), quest.description, quest.usersLimit, quest.messageTimestamp], function(err) {
         if (err == null) {
             console.log(`Inserted quest ${quest.name}`)
             callback(this.lastID)

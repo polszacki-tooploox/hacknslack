@@ -47,8 +47,6 @@ var listener = app.listen(4212, function() {
 // hadnling buttons
 app.post('/', (req, res) => {
     var payload = JSON.parse(req.body.payload)
-    console.log(req.body)
-    return
     switch (payload.type) {
         case 'interactive_message':
             switch (payload.callback_id) {
@@ -63,18 +61,21 @@ app.post('/', (req, res) => {
             let parsedLimit = parseInt(data.heroesLimit)
             let usersLimit = data.heroesLimit == null || isNaN(parsedLimit) ? 999 : parsedLimit
             let quest = {
-                id: data.ts,
                 description: data.description,
                 xp: data.exp,
                 name: data.name,
-                usersLimit: usersLimit
+                usersLimit: usersLimit,
+                messageTimestamp: ""
             }
             database.upsertQuest(quest, (newQuestId) => {
                 database.getQuest(newQuestId, (quest) => {
                     var message = questConstructor.questMessage(quest)
                     var attachment = questConstructor.questAttachments(message, newQuestId)
                     res.send('')
-                    sendMessage("hacknslack", attachment)
+                    sendMessage("hacknslack", attachment, (ts) => {
+                      quest.messageTimestamp = ts
+                      database.upsertQuest(quest, {})
+                    })
                 })
             })
             break
@@ -169,16 +170,22 @@ slackEvents.on('reaction_added', (event) => {
     console.log(`Reaction added: user ${event.user} in channel ${event.item.channel} reaction: ${event.reaction}`);
 });
 
-function sendMessage(channel, attachment) {
+function sendMessage(channel, attachment, callback) {
 
     // Send message using Slack Web Client
-    bot.chat.postMessage({
-            channel: channel,
-            attachments: attachment,
-            as_user: false
-        }, (data) => {
-            console.log(data)
-        })
+  
+    bot.chat.postMessage(
+      { 
+        channel: channel,
+        attachments: attachment,
+        as_user: false
+      })
+    .then((res) => {
+    // `res` contains information about the posted message
+      console.log('Message sent: ', res.ts);
+      callback(res.ts)
+    })
+    .catch(console.error); 
 }
 
 function sendMessageWithoutAttachment(channel, message, userId) {

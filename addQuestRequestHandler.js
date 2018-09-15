@@ -10,8 +10,6 @@ function handleRequest(request, response) {
   // extract the slash command text, and trigger ID from payload
   const { text, trigger_id } = request.body;
 
-  console.log(request)
-
   // Verify the signing secret
     console.log('Verified');
     // create the dialog payload - includes the dialog structure, Slack API token,
@@ -63,9 +61,6 @@ function handleRequest(request, response) {
         ]
       }),
     };
-
-    console.log(dialog)
-    console.log(qs.stringify(dialog))
 
     // open the dialog by calling dialogs.open method and sending the payload
     axios.post(`${apiUrl}/dialog.open`, qs.stringify(dialog), {
