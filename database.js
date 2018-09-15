@@ -93,7 +93,7 @@ function upsertAchievement(achievement, callback) {
     db.run('INSERT OR REPLACE INTO Achievements VALUES(?, ?, ?, ?)', [achievement.id, achievement.name, achievement.icon, achievement.description], function(err) {
         if (err == null) {
             console.log(`Inserted achievement ${achievement.name}`)
-            callback()
+            callback(this.lastID)
         } else {
             console.log(err)
         }

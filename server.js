@@ -180,10 +180,10 @@ let users = bot.users.list().then((users) => {
 // Slack events client
 app.use('/events', slackEvents.expressMiddleware());
 
-slackEvents.on('message', (event) => {
+slackEvents.on('message.channels', (event) => {
     console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
   if(event.text == "Alarm to ja") {
-    showAlarmAchievement(event.user, event.channel)
+    showAlarmAchievement(event.user.id, "hacknslack")
   }
 });
 
@@ -222,12 +222,13 @@ function sendMessageWithoutAttachment(channel, message, userId) {
         })
 }
 
-function sendEphermalMessage(channel, attachment) {
+function sendEphermalMessage(channel, attachment, userId) {
 
     // Send message using Slack Web Client
     bot.chat.postEphemeral({
         attachments: attachment,
             channel: channel,
+            user: userId,
             as_user: false
         }, (data) => {
             console.log(data)
@@ -243,6 +244,14 @@ function updateMessage(channel, attachment, timestamp) {
 }   
 
 
-function showAlarmAchievement(user, channel) {
-  let achievement = ""
+function showAlarmAchievement(userId, channel) {
+  let achievement = achievementsConstructor.alarmAchievement()
+  let attachment = achievementsConstructor.achievementAttachments(achievement)
+  
+  database.upsertAchievement(achievement, (achievementId) => {
+    database.assignAchievementToUser(achievementId, userId, () => {
+      sendEphermalMessage(channel, attachment, userId)
+    })
+  })
+  
 }
