@@ -180,10 +180,10 @@ let users = bot.users.list().then((users) => {
 // Slack events client
 app.use('/events', slackEvents.expressMiddleware());
 
-slackEvents.on('message.channels', (event) => {
+slackEvents.on('message', (event) => {
     console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
-  if(event.text == "Alarm to ja") {
-    showAlarmAchievement(event.user.id, "hacknslack")
+  if(event.text.toLowerCase() == "alarm to ja") {
+    showAlarmAchievement(event.user, "hacknslack")
   }
 });
 
