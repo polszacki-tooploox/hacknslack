@@ -7,7 +7,7 @@ module.exports = {
 
 function questMessage(quest) {
   var quest = quest[0]
-  return `:grey_exclamation:New quest :grey_exclamation:\n${quest.name}\n${quest.description}\n\n:trophy: Reward: ${quest.xp} xp :trophy:`
+  return `:grey_exclamation:*QUEST* :grey_exclamation:\n*${quest.name}*\n${quest.description}\n\n:trophy: Reward: ${quest.xp} xp :trophy:`
 }
 
 function questAttachments(message, questId) {
