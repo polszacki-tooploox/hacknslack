@@ -39,7 +39,7 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
         type: eventMetadata.type,
         userId: null,
         questId: questEventMetadata.questId,
-        message: `Joined quest`
+        message: `Created quest`
       }
   }
 }
@@ -47,7 +47,9 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
 function createEventsResponse(callback) {
   database.getEvents((events) => {
     events.map((event) => {
+      console.log(event)
         var json = JSON.parse(event.data)
+        console.log(json)
         database.getUser(json.userId, (user => {
           database.getQuest(json.questId, (quest) => {
             database.getQuestUsers(json.questId, (users) => {

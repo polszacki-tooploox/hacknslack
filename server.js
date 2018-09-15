@@ -34,7 +34,7 @@ app.use(express.static('public'));
 app.get("/bot_events", (request, response) => {
   events.createEventsResponse((eventsJSON) => {
     console.log(eventsJSON)
-    response.send(eventsJSON)
+    response.json(eventsJSON)
   })
 })
 
@@ -88,8 +88,9 @@ app.post('/', (req, res) => {
                     res.send('')
                     console.log(eventType.questCreated)
                     var eventJson = events.eventCreator({
-                        type: eventType.questCreated
-                    }, {}, {newQuestId})
+                        type: eventType.questCreated,
+                        associatedData: {newQuestId}
+                    }, {}, {questId: newQuestId})
                     console.log(eventJson)
                     database.insertEvent(JSON.stringify(eventJson))
                     sendMessage("hacknslack", attachment, (ts) => {
@@ -180,6 +181,9 @@ app.use('/events', slackEvents.expressMiddleware());
 
 slackEvents.on('message', (event) => {
     console.log(`Received a message event: user ${event.user} in channel ${event.channel} says ${event.text}`);
+  if(event.text == "Alarm to ja") {
+    showAlarmAchievement(event.user, event.channel)
+  }
 });
 
 slackEvents.on('reaction_added', (event) => {
@@ -217,6 +221,18 @@ function sendMessageWithoutAttachment(channel, message, userId) {
         })
 }
 
+function sendEphermalMessage(channel, attachment) {
+
+    // Send message using Slack Web Client
+    bot.chat.postEphemeral({
+        attachments: attachment,
+            channel: channel,
+            as_user: false
+        }, (data) => {
+            console.log(data)
+        })
+}
+
 function updateMessage(channel, attachment, timestamp) {
     bot.chat.update({
         channel: channel,
@@ -224,3 +240,8 @@ function updateMessage(channel, attachment, timestamp) {
         ts: timestamp
     })
 }   
+
+
+function showAlarmAchievement(user, channel) {
+  
+}
