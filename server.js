@@ -24,6 +24,13 @@ database.initDatabase()
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
 
+app.get("/bot_events", (request, response) => {
+  
+  database.getEvents((events)=> {
+    console.log(events)
+  })  
+})
+
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function(request, response) {
     response.sendFile(__dirname + '/views/index.html');
