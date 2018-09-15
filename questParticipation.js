@@ -6,6 +6,7 @@ module.exports = {
 };
 
 var database = require("./database")
+var Events = require("./events")
 var xpLevels = [
   10,
   30,
@@ -71,8 +72,12 @@ function updateXP(user, xp) {
   if (currentXP == null) {
       currentXP = 0
   }
+  var previousLevel = user.level
   var currentLevel = calculateLevel(currentXP)
   database.updateUserXPAndLevel(user.id, currentXP + xp, currentLevel)
+  if (previousLevel < currentLevel) {
+      userDidLevelUp(user.id, currentLevel)
+  }
 }
 
 function checkIfUserIsParticipating(userId, questId, callback) {
@@ -95,5 +100,13 @@ function calculateLevel(xp) {
     return xpLevels.findIndex((element) => {
         return xp < element
     }) +1
+}
+
+function userDidLevelUp(userId, level) {
+    var eventJson = Events.eventCreator({
+        type: Events.eventType.levelUp,
+        associatedData: level
+    }, {userId})
+    database.insertEvent(JSON.stringify(eventJson))
 }
 
