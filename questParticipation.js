@@ -1,19 +1,21 @@
 module.exports = {
     participateInQuest,
     ignoreQuest,
-    checkIfQuestIsFull
+    checkQuestStatus
 };
 
 var database = require("./database")
 
-function checkIfQuestIsFull(questId, callback) {
+function checkQuestStatus(questId, callback) {
   
   database.getQuestUsers(questId, (questUserIds) => {
     database.getQuest(questId, (quest) => {
         if (quest.usersLimit == questUserIds.length) {
-          callback(true)
+          callback(true, false)
+        } else if (questUserIds.length == 0 || questUserIds == null) {
+          callback(false, true)
         } else {
-          callback(false)
+          callback(false, false)
         }
      })
   })

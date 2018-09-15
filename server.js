@@ -10,6 +10,7 @@ var heroReportHandler = require('./heroReportHandler')
 var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
 var ignoreQuest = require('./questParticipation').ignoreQuest
+var checkQuestStatus = require('./questParticipation').checkQuestStatus
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -82,18 +83,31 @@ function handleQuestInteraction(payload, res) {
   } else {
       handleQuestIgnore(payload.user.id, questId)
   }
-  database.getQuest(questId, (quest) => {
-      database.getQuestUsers(questId, (userIds) => {
-          var message = questConstructor.questMessage(quest)
-          var attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
-          res.send('')
-          updateMessage(payload.channel.id, attachment, payload.message_ts)
-      })
-  })
+
+  updateQuestMessage(payload, questId)
+  res.send('')
 }
 
-function updateQuestMessage() {
-  
+function updateQuestMessage(payload, questId) {
+  database.getQuest(questId, (quest) => {
+      database.getQuestUsers(questId, (userIds) => {
+        
+        checkQuestStatus(questId, (isFull, isEmpty) => {
+          var message = ""
+          var attachment = new Object()
+          if(isFull) {
+            message = questConstructor.questMessage(quest)
+            attachment = questConstructor.questAttachmentsLimitsReached(message, userIds, questId)
+          } else {
+            message = questConstructor.questMessage(quest)
+            attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
+          }
+          
+          updateMessage(payload.channel.id, attachment, payload.message_ts)
+        })
+        
+      })
+  })
 }
 
 function handleQuestAcceptance(userId, questId) {
