@@ -58,7 +58,6 @@ function handleRequest(request, response) {
             subtype: 'number',
             name: 'heroesLimit',
             optional: true,
-            value: 1,
             hint: 'Number of heroes needed',
           },
         ]
