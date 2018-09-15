@@ -26,8 +26,7 @@ database.initDatabase()
 app.use(express.static('public'));
 
 app.get("/bot_events", (request, response) => {
-  
-  events.createEventsResponse(database, (eventsJSON) => {
+  events.createEventsResponse((eventsJSON) => {
     console.log(eventsJSON)
     response.send(eventsJSON)
   })

@@ -5,6 +5,8 @@ module.exports = {
     createEventsResponse
 }
 
+var database = require("./database")
+
 var eventType = {
   levelUp: "levelUp",
   questMade: "questMade",
@@ -22,7 +24,7 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
       return {
         userId: userEventMetadata.userId,
         questId: null,
-        message: `Gained new level`
+        message: `Gained new level ${eventMetadata.associatedData}`
       }
     case eventType.questMade:
       return {
@@ -39,10 +41,34 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
   }
 }
 
-function createEventsResponse(database) {
+function createEventsResponse(callback) {
   database.getEvents((events) => {
     events.map((event) => {
-      
+        var json = JSON.parse(event.data)
+        database.getUser(json.userId, (user => {
+          database.getQuest(json.questId, (quest) => {
+            database.getQuestUsers(json.questId, (users) => {
+                callback(buildResponse(event, user, quest, users))
+            })
+          })
+        }))
     })
   })
+}
+
+function buildResponse(event, user, quest, questUsers) {
+  var response = {
+    type: event.type,
+    message: event.message
+  }
+  if (user) {
+    response.user = user
+  }
+  if(quest) {
+    if(questUsers) {
+      quest.questUsers = questUsers
+    }
+    response.quest = quest
+  }
+  return response
 }
