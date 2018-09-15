@@ -11,6 +11,7 @@ var questConstructor = require('./questConstructor')
 var participateInQuest = require('./questParticipation').participateInQuest
 var ignoreQuest = require('./questParticipation').ignoreQuest
 var checkQuestStatus = require('./questParticipation').checkQuestStatus
+var events = require('./events')
 var app = express();
 app.use(bodyParser.urlencoded({
     extended: true
@@ -26,9 +27,10 @@ app.use(express.static('public'));
 
 app.get("/bot_events", (request, response) => {
   
-  database.getEvents((events)=> {
-    console.log(events)
-  })  
+  events.createEventsResponse(database, (eventsJSON) => {
+    console.log(eventsJSON)
+    response.send(eventsJSON)
+  })
 })
 
 // http://expressjs.com/en/starter/basic-routing.html
