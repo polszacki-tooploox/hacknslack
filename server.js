@@ -80,9 +80,11 @@ app.post('/', (req, res) => {
                     var message = questConstructor.questMessage(quest)
                     var attachment = questConstructor.questAttachments(message, newQuestId)
                     res.send('')
+                    console.log(events.eventType.questCreated)
                     var eventJson = events.eventCreator({
                         type: events.eventType.questCreated
                     }, {}, {newQuestId})
+                    console.log(eventJson)
                     database.insertEvent(JSON.stringify(eventJson))
                     sendMessage("hacknslack", attachment, (ts) => {
                       quest.messageTimestamp = ts
