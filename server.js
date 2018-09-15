@@ -1,14 +1,5 @@
 // server.js
 // where your node app starts
-let betKey = "bet"
-let matchesKey = "matches"
-let todayKey = "today"
-let topKey = "top"
-let couponsKey = "coupons"
-let helpKey = "help"
-let maxPoints = 8
-let minPoints = 3
-
 
 // init project
 var express = require('express');
@@ -145,11 +136,6 @@ slackEvents.on('message', (event) => {
 slackEvents.on('app_mention', (event) => {
     console.log(`Received a mention event: user ${event.user} in channel ${event.channel} says ${event.text}`);
 });
-
-// This function is discussed in "Responding to actions" below
-function handlerFunction() {
-  Console.log("Received action")
-}
 
 function sendMessage(channel, attachment) {
 
