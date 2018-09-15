@@ -1,10 +1,21 @@
 module.exports = {
     participateInQuest,
     ignoreQuest,
+    xpLevels,
     checkQuestStatus
 };
 
 var database = require("./database")
+var xpLevels = [
+  10,
+  30,
+  60,
+  100,
+  150,
+  220,
+  300,
+  9999999
+]
 
 function checkQuestStatus(questId, callback) {
   
@@ -81,15 +92,8 @@ function checkIfUserIsParticipating(userId, questId, callback) {
 }
 
 function calculateLevel(xp) {
-    var xpLevels = [
-        1000,
-        3000,
-        5000,
-        10000,
-        20000
-    ]
     return xpLevels.findIndex((element) => {
         return xp < element
-    })
+    }) +1
 }
 

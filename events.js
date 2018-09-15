@@ -15,7 +15,6 @@ var eventMetadata = {
   associatedData: ""
 }
 
-
 function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
   switch (eventMetadata.type) {
     case eventType.levelUp:
@@ -37,4 +36,7 @@ function eventCreator(eventMetadata, userEventMetadata, questEventMetadata) {
         message: `Joined quest`
       }
   }
+}
+
+function createEventsResponse() {
 }
