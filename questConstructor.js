@@ -1,7 +1,8 @@
 module.exports = {
   questMessage,
   questAttachments,
-  questAttachmentsAccepted
+  questAttachmentsAccepted,
+  questAttachmentsLimitsReached
 };
 
 function questMessage(quest) {

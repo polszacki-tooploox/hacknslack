@@ -10,7 +10,7 @@ function checkQuestStatus(questId, callback) {
   
   database.getQuestUsers(questId, (questUserIds) => {
     database.getQuest(questId, (quest) => {
-        if (quest.usersLimit == questUserIds.length) {
+        if (quest[0].usersLimit == questUserIds.length) {
           callback(true, false)
         } else if (questUserIds.length == 0 || questUserIds == null) {
           callback(false, true)

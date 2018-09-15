@@ -93,13 +93,16 @@ function updateQuestMessage(payload, questId) {
       database.getQuestUsers(questId, (userIds) => {
         
         checkQuestStatus(questId, (isFull, isEmpty) => {
-          var message = ""
+          var message = questConstructor.questMessage(quest)
           var attachment = new Object()
           if(isFull) {
-            message = questConstructor.questMessage(quest)
+            console.log("isFull")
             attachment = questConstructor.questAttachmentsLimitsReached(message, userIds, questId)
+          } else if(isEmpty) {
+            console.log("isEmpty")
+            attachment = questConstructor.questAttachments(message, questId)
           } else {
-            message = questConstructor.questMessage(quest)
+            console.log("not empty, not full")
             attachment = questConstructor.questAttachmentsAccepted(message, userIds, questId)
           }
           
